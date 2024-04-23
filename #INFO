@@ -1,0 +1,5 @@
+!name: atlas-dev
+!build: Harmony
+!version: null
+!description: {"atlas-dev, a repository were the latest builds are saved before preview or official release. To build Atlas, for Windows users, run .\build.bat, the script should automatically build the image. For Linux users run .\build.sh."}
+!todo: {"x64 compatibility for ExtendedProgram (long mode)"}
