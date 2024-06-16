@@ -15,14 +15,18 @@
 #include "base_utils/basesystem.h"
 #include "base_utils/acpi/acpi.h"
 #include "base_utils/hardw/pci.h"
+#include "base_utils/basesystem.h"
+#include <efi.h>
+#include <log.h>
 
 struct BootInfo {
 	FrameBuffer* framebuffer;
 	PSF1_FONT* psf1_Font;
-	EFI_MEMORY_DESCRIPTOR* mMap;
+	KEFI_MEMORY_DESCRIPTOR* mMap;
 	uint64_t mMapSize;
 	uint64_t mMapDescSize;
 	ACPI::RSDP2* rsdp;
+	EFI_SYSTEM_TABLE *SystemTable;
 };
 
 extern uint64_t _KAtaStart;

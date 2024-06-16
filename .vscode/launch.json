@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Facil/atlas-dev/gnu-efi/bootloader",
-      "program": "c:/Users/Facil/atlas-dev/gnu-efi/bootloader/build/Debug/outDebug",
+      "cwd": "c:/Users/Facil/atlas-dev/kernel/src/base_utils/hardw",
+      "program": "c:/Users/Facil/atlas-dev/kernel/src/base_utils/hardw/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

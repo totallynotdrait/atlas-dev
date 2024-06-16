@@ -3,12 +3,14 @@
 #include "base_utils/interrupts/IDT.h"
 #include "base_utils/interrupts/interrupts.h"
 #include "base_utils/IO/IO.h"
+#include "base_utils/panic/panic.h"
 
 
 
 KAtaInfo kataInfo;
 
 void PrepareMemory(BootInfo* bootInfo) {
+	glog->print("Preparing memory.");
 	uint64_t mMapEntries = bootInfo->mMapSize / bootInfo->mMapDescSize;
 
     GlobalAllocator = PageFrameAllocator();
@@ -38,10 +40,13 @@ void PrepareMemory(BootInfo* bootInfo) {
     asm ("mov %0, %%cr3" : : "r" (PML4));
 
 	kataInfo.pageTableManager = &GPageTableManager;
+	glog->ok("Prepared memory.");
 }
 
 IDTR idtr;
 void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t selector) {
+	GKRenderer->printf("           "); GKRenderer->printf(to_hexstring((uint64_t)handler)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(entryOffset)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(type_attr)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(selector));
+	GKRenderer->Next();
 	IDTDescEntry* interrupt = (IDTDescEntry*)(idtr.Offset + entryOffset * sizeof(IDTDescEntry));
 	interrupt->SetOffset((uint64_t)handler);
 	interrupt->type_attr = type_attr;
@@ -49,6 +54,7 @@ void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t s
 }
 
 void PrepareInterrupts() {
+	glog->print("Preparing interrupts...");
 	idtr.Limit = 0x0FFF;
 	idtr.Offset = (uint64_t)GlobalAllocator.RequestPage();
 
@@ -62,40 +68,46 @@ void PrepareInterrupts() {
 	asm ("lidt %0" : : "m" (idtr));
 
 	RemapPIC();
+	glog->ok("Interrupts are ready.");
 }
 
 void PrepareACPI(BootInfo* BootInfo) {
+	glog->print("Preparing ACPI...");
 	ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(BootInfo->rsdp->XSDTAddress);
 	ACPI::MCFGHeader* mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(xsdt, (char*)"MCFG");
 
 	PCI::EnumeratePCI(mcfg);
+	glog->ok("Prepared ACPI.");
 }
 
 KAtaRenderer r = KAtaRenderer(NULL, NULL);
 KAtaInfo InitializeKAta(BootInfo* BootInfo) {
+	memset(BootInfo->framebuffer->BaseAddress, 0, BootInfo->framebuffer->BufferSize);
+
 	r = KAtaRenderer(BootInfo->framebuffer, BootInfo->psf1_Font);
 	GKRenderer = &r;
-
-
+	glog->ok("KAtaRenderer is ready.");
+	glog->print("Preparing and loading GDTDescriptor...");
 	GDTDescriptor gdtDescriptor;
 	gdtDescriptor.Size = sizeof(GDT) - 1;
 	gdtDescriptor.Offset = (uint64_t)&DefaultGDT;
 	LoadGDT(&gdtDescriptor);
+	glog->ok("Loaded GDTDescriptor.");
 	
 	PrepareMemory(BootInfo);
 
-	memset(BootInfo->framebuffer->BaseAddress, 0, BootInfo->framebuffer->BufferSize);
-
 	PrepareInterrupts();
-
+	
 	InitPS2Mouse();
 
 	PrepareACPI(BootInfo);
 
+	glog->print("Finishing with interrupts...");
 	outb(PIC1_DATA, 0b11111001);
 	outb(PIC2_DATA, 0b11101111);
 
 	asm ("sti");
-
+	
+	glog->ok("KAta ready.");
 	return kataInfo;
 }

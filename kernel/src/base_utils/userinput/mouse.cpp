@@ -13,22 +13,22 @@
 #include "mouse.h"
 
 uint8_t MousePointer[] = {
-    0b11111111, 0b11100000, 
-    0b11111111, 0b10000000, 
-    0b11111110, 0b00000000, 
-    0b11111100, 0b00000000, 
-    0b11111000, 0b00000000, 
-    0b11110000, 0b00000000, 
-    0b11100000, 0b00000000, 
-    0b11000000, 0b00000000, 
-    0b11000000, 0b00000000, 
-    0b10000000, 0b00000000, 
-    0b10000000, 0b00000000, 
-    0b00000000, 0b00000000, 
-    0b00000000, 0b00000000, 
-    0b00000000, 0b00000000, 
-    0b00000000, 0b00000000, 
-    0b00000000, 0b00000000, 
+    0b11000000, 0b00000001, 
+    0b10100000, 0b00000001, 
+    0b10010000, 0b00000001, 
+    0b10001000, 0b00000001, 
+    0b10000100, 0b00000001, 
+    0b10000010, 0b00000001, 
+    0b10000001, 0b00000001, 
+    0b10000000, 0b10000001, 
+    0b10000000, 0b01000001, 
+    0b10000000, 0b00100001, 
+    0b10000000, 0b00010001, 
+    0b10000000, 0b00001001, 
+    0b10000000, 0b00000101, 
+    0b10000000, 0b00000011, 
+    0b10000000, 0b00000001, 
+    0b10000000, 0b00000001, 
 };
 
 void MouseWait() {
@@ -68,20 +68,26 @@ Point MousePosition;
 Point MousePositionOld;
 
 void HandlePS2Mouse(uint8_t data) {
+
+    ProcessMousePacket();
+
+    static bool skip = true;
+    if (skip) { skip = false; return; }
+
     switch (mouseCycle) {
         case 0:
-            if (MousePacketReady) break;
+            
             if (data & 0b00001000 == 0) break;
             MousePacket[0] = data;
             mouseCycle++;
             break;
         case 1:
-            if (MousePacketReady) break;
+            
             MousePacket[1] = data;
             mouseCycle++;
             break;
         case 2:
-            if (MousePacketReady) break;
+            // if (MousePacketReady) break;
             MousePacket[2] = data;
             MousePacketReady = true;
             mouseCycle = 0;
@@ -165,6 +171,7 @@ void ProcessMousePacket() {
 }
 
 void InitPS2Mouse() {
+    glog->print("Initializing PS2 Mouse...");
     outb(0x64, 0xA8);
     MouseWait();
     outb(0x64, 0x20);
@@ -181,4 +188,5 @@ void InitPS2Mouse() {
 
     MouseWrite(0xF4);
     MouseRead();
+    glog->ok("Initialized PS2 Mouse.");
 }

@@ -22,20 +22,14 @@
 #include "kataUtil.h"
 
 extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
-
+    isKeyboardEnabled = true;
+    basesystem bs;
+    log log;
     KAtaInfo kataInfo = InitializeKAta(bootInfo);
     PageTableManager* pageTableManager = kataInfo.pageTableManager;
-    GKRenderer->printf("Atlas and KAta booted successfully, infjmp init...");
-    GKRenderer->Next();
-    GKRenderer->printf(to_hexstring((uint64_t)bootInfo->rsdp));    
-    GKRenderer->Next();
-
-
-    while (true)
-    {
-        ProcessMousePacket();
-    }
+    log.ok("Atlas initialized succefully.");
     
+    bs.reboot(bootInfo);
 
     while (true);
 }

@@ -26,11 +26,9 @@ namespace PCI {
     };
 
     const char* GetVendorName(uint16_t vendorID) {
-        switch (vendorID)
-        {
+        switch (vendorID) {
         case 0x8086:
             return "Intel Corporation";
-        
         case 0x1022:
             return "AMD";
         case 0x10DE:
@@ -78,8 +76,103 @@ namespace PCI {
             }
         }
         return to_hexstring(deviceID);
+    }
 
-        // https://www.youtube.com/watch?v=GxLL_lbOPo4&list=PLxN4E629pPnJxCQCLy7E0SQY_zuumOVyZ&index=20&ab_channel=Poncho
-        // (11:05)
+    const char* MassStorageControllerSubclassName(uint8_t subclassCode) {
+        switch (subclassCode) {
+            case 0x00:
+                return "SCSI Bus Controller";
+            case 0x01:
+                return "IDE Controller";
+            case 0x02:
+                return "Floppy Disk Controller"; 
+            case 0x03:
+                return "IPI Bus Controller";
+            case 0x04:
+                return "RAID Controller";
+            case 0x05:
+                return "ATA Controller";
+            case 0x06:
+                return "Serial ATA Controller";
+            case 0x07:
+                return "Serial Attached SCSI Controller";
+            case 0x08:
+                return "Non-Volatile Memory Controller";
+            case 0x80:
+                return "Not known (Other)";
+        }
+        return to_hexstring(subclassCode);
+    }
+
+    const char* GetSubclassName(uint8_t classCode, uint8_t subclassCode) {
+        switch (classCode) {
+            case 0x01: // Mass Storage Controller
+                return MassStorageControllerSubclassName(subclassCode);
+        }
+        return to_hexstring(subclassCode);
+    }
+
+    const char* GetProgIFName(uint8_t classCode, uint8_t subclassCode, uint8_t progIF){
+        switch (classCode) {
+            case 0x01:
+                switch (subclassCode) {
+                    case 0x01: // IDE Controller
+                        switch (progIF) {
+                            case 0x00: return "ISA Compatibility mode-only controller";
+                            case 0x05: return "PCI native mode-only controller";
+                            case 0x0A: return "ISA Compatibility mode controller";
+                            case 0x0F: return "PCI native mode controller";
+                            case 0x80: return "ISA Compatibility mode-only controller";
+                            case 0x85: return "PCI native mode-only controller, supports bus mastering";
+                            case 0x8A: return "ISA Compatibility mode controller";
+                            case 0x8F: return "PCI native mode controller";
+                        }
+
+                    case 0x05: // ATA Controller 
+                        switch (progIF) {
+                            case 0x20: return "Single DMA";
+                            case 0x30: return "Chained DMA";
+                        }
+                    case 0x06: // Serial ATA Controller 
+                        switch (progIF) {
+                            case 0x00: return "Vendor Specific Interface";
+                            case 0x01: return "AHCI 1.0";
+                            case 0x02: return "Serial Storage Bus";
+                        }
+                    case 0x07: // Serial Attached SCSI Controller
+                        switch (progIF) {
+                            case 0x00: return "SAS";
+                            case 0x01: return "Serial Storage Bus";
+                        }
+                    case 0x08: // Non-Volatile Memory Controller
+                        switch (progIF) {
+                            case 0x00: return "NVMHCI";
+                            case 0x01: return "NVM Express";
+                        }
+                }
+
+            case 0x03:
+                switch (subclassCode) {
+                    case 0x00:
+                        switch (progIF) {
+                            case 0x00: return "VGA Controller";
+                            case 0x01: return "8514-Compatible Controller";
+                        }
+                }
+
+            case 0x0C:
+                switch (subclassCode) {
+                    case 0x03:
+                        switch (progIF) {
+                            case 0x00: return "UHCI Controller";                                
+                            case 0x10: return "OHCI Controller";                               
+                            case 0x20: return "EHCI (USB2) Controller";                                
+                            case 0x30: return "XHCI (USB3) Controller";    
+                            case 0x80: return "Unspecified";
+                            case 0xFE: return "USB Device (Not a Host Controller)";  
+                        }
+                }    
+        }
+        return to_hexstring(progIF);
     }
 } 

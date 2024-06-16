@@ -30,6 +30,7 @@ class KAtaRenderer {
     void ClearChar();
     void Clear();
     void Next();
+    void Scroll();
     void DrawOverlayMouseCurosr(uint8_t* mouseCursor, Point position, uint32_t color);
     void ClearMouseCursor(uint8_t* mouseCursor, Point position);
     bool MouseDrawn;

@@ -4,15 +4,15 @@
 #include "../userinput/keyboard.h"
 
 __attribute__((interrupt)) void PageFault_Handler(interrupt_frame* frame) {
-    Panic("Page Fault Detected");
+    Panic("PAGE_FAULT");
     while (true);
 }
 __attribute__((interrupt)) void DoubleFault_Handler(interrupt_frame* frame) {
-    Panic("Double Fault Detected");
+    Panic("DOUBLE_FAULT");
     while (true);
 }
 __attribute__((interrupt)) void GPFault_Handler(interrupt_frame* frame) {
-    Panic("General Protection Fault Detected");
+    Panic("GENERAL_PROTECTION_FAULT");
     while (true);
 }
 __attribute__((interrupt)) void KeyboardInt_Handler(interrupt_frame* frame) {

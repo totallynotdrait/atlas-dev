@@ -1,6 +1,7 @@
 #pragma once
 #include "../../kata_renderer/kata_renderer.h"
 #include "../userinput/mouse.h"
+#include <log.h>
 
 #define PIC1_COMMAND 0x20
 #define PIC1_DATA 0x21

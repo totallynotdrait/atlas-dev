@@ -75,7 +75,7 @@ void KAtaRenderer::scanf(const char* str) {
 }
 
 void KAtaRenderer::putChar(char chr, unsigned int xOff, unsigned int yOff) {
-    if (xOff + 8 > TargetFramebuffer->Width || yOff + 16 > TargetFramebuffer->Height) return;
+    if (CursorPosition.X + 8 > TargetFramebuffer->Width) return; // avoid crashing
     unsigned int* pixPtr =  (unsigned int*)TargetFramebuffer->BaseAddress;
     char* fontPtr = (char*)PSF1_Font->glyphBuffer + (chr * PSF1_Font->psf1_Header->charsize);
     for (unsigned long y = yOff; y < yOff + 16; y++) {
@@ -89,6 +89,7 @@ void KAtaRenderer::putChar(char chr, unsigned int xOff, unsigned int yOff) {
 }
 
 void KAtaRenderer::putChar(char chr) {
+    
     putChar(chr, CursorPosition.X, CursorPosition.Y);
     CursorPosition.X += 8;
     if (CursorPosition.X + 8 > TargetFramebuffer->Width) {

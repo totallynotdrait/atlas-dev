@@ -124,6 +124,7 @@ typedef struct {
 	UINTN mMapSize;
 	UINTN mMapDescSize;
 	void* rsdp;
+	EFI_SYSTEM_TABLE SystemTable;
 } BootInfo;
 
 UINTN strcmp(CHAR8* a, CHAR8* b, UINTN length) {
@@ -139,7 +140,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
 	EFI_FILE* KAta = LoadFile(NULL, L"kata.elf", ImageHandle, SystemTable);
 	if (LoadFile(NULL, L"kata.elf", ImageHandle, SystemTable) == NULL) {
-		Print(L"\n\rKATA:BOOTLOADER:PANIC: Could not load KAta, i guess we're just you and me :3\n\r");
+		Print(L"\n\rKATA:BOOTLOADER:PANIC: Could not load KAta, i guess we're just here alone, you and me >:3\n\r");
 	} else {
 		Print(L"\n\rLoaded KAta\n\r");
 	}
@@ -200,7 +201,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
 	PSF1_FONT* newFont = LoadPSF1Font(NULL, L"zap-light16.psf", ImageHandle, SystemTable);
 	if (newFont == NULL) {
-		Print(L"Invalid font or binary not found");
+		Print(L"Invalid font or binary not found\n");
 	} else {
 		Print(L"Font found. char size = %d\n\r", newFont->psf1_Header->charsize);
 	}
@@ -246,6 +247,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.mMapSize = MapSize;
 	bootInfo.mMapDescSize = DescriptorSize;
 	bootInfo.rsdp = rsdp;
+	bootInfo.SystemTable = *SystemTable;
 
 	SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
 

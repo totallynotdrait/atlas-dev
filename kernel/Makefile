@@ -8,7 +8,7 @@ CC = gcc
 ASMC = nasm
 LD = ld
 
-CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone
+CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -I$(GNUEFI)/inc -I$(GNUEFI)/inc/x86_64 -Isrc/log
 ASMFLAGS = 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
@@ -30,12 +30,12 @@ kata: $(OBJS) link
 $(OBJDIR)/kata_renderer/kata_renderer.o: $(SRCDIR)/kata_renderer/kata_renderer.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"
 	@mkdir -p $(@D)
-	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -c $^ -o $@
+	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -I$(GNUEFI)/inc -I$(GNUEFI)/inc/x86_64 -Isrc/log -c $^ -o $@
 
 $(OBJDIR)/base_utils/interrupts/interrupts.o: $(SRCDIR)/base_utils/interrupts/interrupts.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"
 	@mkdir -p $(@D)
-	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -c $^ -o $@
+	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -I$(GNUEFI)/inc -I$(GNUEFI)/inc/x86_64 -Isrc/log -c $^ -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"
@@ -65,6 +65,7 @@ buildimg:
 	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BOOTEFI) ::/EFI/BOOT
 	mcopy -i $(BUILDDIR)/$(OSNAME).img startup.nsh ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/kata.elf ::
+	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/zap-vga16.psf ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/zap-light16.psf ::
 
 run:
