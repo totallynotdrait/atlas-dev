@@ -27,3 +27,5 @@ Atlas can be booted via USB by following this steps:
 
 If you want you can boot with floopy disks by doing the same steps for USB.
 Altough is it not recommended to do it as it can have slow perfomance or random frezzes.
+
+Tested on MacBook Air 2013 Model, boot process stops at PrepareMemory, apple makes everything difficult...
