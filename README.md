@@ -5,7 +5,7 @@ This repository is dedicated for development before release.
 # Requirements
 - CPU: A 64 bit cpu with at least 1 core.
 - RAM: Any size is accetable, will fail to boot if it's or less than 40 mb.
-- GPU: Intrigated or deticated is accetable.
+- GPU: integrated or dedicated is accetable.
 - STORAGE: N/A.
 - A UEFI Firmware, meaning the system must have a UEFI BIOS and not legacy.
 
