@@ -11,7 +11,7 @@ namespace PCI {
         if (pciDeviceHeader->DeviceID == 0) return;
         if (pciDeviceHeader->DeviceID == 0xFFFF) return;  
 
-        GKRenderer->printf(GetVendorName(pciDeviceHeader->VendorID));
+        /* GKRenderer->printf(GetVendorName(pciDeviceHeader->VendorID));
         GKRenderer->printf(" / ");
         GKRenderer->printf(GetDeviceName(pciDeviceHeader->VendorID, pciDeviceHeader->DeviceID));
         GKRenderer->printf(" / ");
@@ -20,7 +20,7 @@ namespace PCI {
         GKRenderer->printf(GetSubclassName(pciDeviceHeader->Class, pciDeviceHeader->Subclass));
         GKRenderer->printf(" / ");
         GKRenderer->printf(GetProgIFName(pciDeviceHeader->ProgIF, pciDeviceHeader->Class, pciDeviceHeader->Subclass));
-        GKRenderer->Next();
+        GKRenderer->Next(); */
 
 
     }
