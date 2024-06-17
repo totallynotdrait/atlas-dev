@@ -6,17 +6,17 @@
 // "[ WARN ]"
 // "           d"
 
-log* glog;
+Log* log;
 
-log::log() {}
+Log::Log() {}
 
-void log::print(const char *str) {
+void Log::print(const char *str) {
     GKRenderer->printf("           ");
     GKRenderer->printf(str);
     GKRenderer->Next();
 }
 
-void log::info(const char *str) {
+void Log::info(const char *str) {
     GKRenderer->printf("[ "); GKRenderer->Color = 0x00b2ff;
     GKRenderer->printf("INFO"); GKRenderer->Color = 0xffffff;
     GKRenderer->printf(" ]");
@@ -25,7 +25,7 @@ void log::info(const char *str) {
     GKRenderer->Next();
 }
 
-void log::ok(const char *str) {
+void Log::ok(const char *str) {
     GKRenderer->printf("[  "); GKRenderer->Color = 0x00ff3a;
     GKRenderer->printf("OK"); GKRenderer->Color = 0xffffff;
     GKRenderer->printf("  ]");
@@ -34,7 +34,7 @@ void log::ok(const char *str) {
     GKRenderer->Next();
 }
 
-void log::warn(const char *str) {
+void Log::warn(const char *str) {
     GKRenderer->printf("[ "); GKRenderer->Color = 0xff8700;
     GKRenderer->printf("WARN"); GKRenderer->Color = 0xffffff;
     GKRenderer->printf(" ]");
@@ -43,7 +43,7 @@ void log::warn(const char *str) {
     GKRenderer->Next();
 }
 
-void log::failed(const char *str) {
+void Log::failed(const char *str) {
     GKRenderer->printf("["); GKRenderer->Color = 0xff3333;
     GKRenderer->printf("FAILED"); GKRenderer->Color = 0xffffff;
     GKRenderer->printf("]");

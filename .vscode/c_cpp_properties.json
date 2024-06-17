@@ -3,7 +3,12 @@
     {
       "name": "windows-gcc-x64",
       "includePath": [
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/kernel/src/inc",
+        "${workspaceFolder}/kernel/src",
+        "${workspaceFolder}/kernel/src/log",
+        "${workspaceFolder}/gnu-efi/inc",
+        "${workspaceFolder}/gnu-efi/inc/x86_64",
+        "${workspaceFolder}/kernel/src/kata_renderer"
       ],
       "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
       "cStandard": "${default}",

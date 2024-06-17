@@ -1,16 +1,16 @@
 #include "kataUtil.h"
-#include "base_utils/gdt/gdt.h"
-#include "base_utils/interrupts/IDT.h"
-#include "base_utils/interrupts/interrupts.h"
-#include "base_utils/IO/IO.h"
-#include "base_utils/panic/panic.h"
+#include <gdt/gdt.h>
+#include <interrupts/IDT.h>
+#include <interrupts/interrupts.h>
+#include <IO/IO.h>
+#include <panic/panic.h>
 
 
 
 KAtaInfo kataInfo;
 
 void PrepareMemory(BootInfo* bootInfo) {
-	glog->print("Preparing memory.");
+	log->print("Preparing memory.");
 	uint64_t mMapEntries = bootInfo->mMapSize / bootInfo->mMapDescSize;
 
     GlobalAllocator = PageFrameAllocator();
@@ -40,7 +40,7 @@ void PrepareMemory(BootInfo* bootInfo) {
     asm ("mov %0, %%cr3" : : "r" (PML4));
 
 	kataInfo.pageTableManager = &GPageTableManager;
-	glog->ok("Prepared memory.");
+	log->ok("Prepared memory.");
 }
 
 IDTR idtr;
@@ -54,7 +54,7 @@ void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t s
 }
 
 void PrepareInterrupts() {
-	glog->print("Preparing interrupts...");
+	log->print("Preparing interrupts...");
 	idtr.Limit = 0x0FFF;
 	idtr.Offset = (uint64_t)GlobalAllocator.RequestPage();
 
@@ -68,31 +68,35 @@ void PrepareInterrupts() {
 	asm ("lidt %0" : : "m" (idtr));
 
 	RemapPIC();
-	glog->ok("Interrupts are ready.");
+	log->ok("Interrupts are ready.");
 }
 
 void PrepareACPI(BootInfo* BootInfo) {
-	glog->print("Preparing ACPI...");
+	log->print("Preparing ACPI...");
 	ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(BootInfo->rsdp->XSDTAddress);
 	ACPI::MCFGHeader* mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(xsdt, (char*)"MCFG");
 
 	PCI::EnumeratePCI(mcfg);
-	glog->ok("Prepared ACPI.");
+	log->ok("Prepared ACPI.");
 }
 
 KAtaRenderer r = KAtaRenderer(NULL, NULL);
 KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 	memset(BootInfo->framebuffer->BaseAddress, 0, BootInfo->framebuffer->BufferSize);
-
+	
 	r = KAtaRenderer(BootInfo->framebuffer, BootInfo->psf1_Font);
 	GKRenderer = &r;
-	glog->ok("KAtaRenderer is ready.");
-	glog->print("Preparing and loading GDTDescriptor...");
+	log->ok("KAtaRenderer is ready.");
+
+	/* Panic("MA QUANTO BELLO ANDARE IN GIRO PER I COLLI BOLOGNESI");
+	while (true); */
+	
+	log->print("Preparing and loading GDTDescriptor...");
 	GDTDescriptor gdtDescriptor;
 	gdtDescriptor.Size = sizeof(GDT) - 1;
 	gdtDescriptor.Offset = (uint64_t)&DefaultGDT;
 	LoadGDT(&gdtDescriptor);
-	glog->ok("Loaded GDTDescriptor.");
+	log->ok("Loaded GDTDescriptor.");
 	
 	PrepareMemory(BootInfo);
 
@@ -102,12 +106,12 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 
 	PrepareACPI(BootInfo);
 
-	glog->print("Finishing with interrupts...");
+	log->print("Finishing with interrupts...");
 	outb(PIC1_DATA, 0b11111001);
 	outb(PIC2_DATA, 0b11101111);
 
 	asm ("sti");
 	
-	glog->ok("KAta ready.");
+	log->ok("KAta ready.");
 	return kataInfo;
 }

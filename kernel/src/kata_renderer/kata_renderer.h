@@ -1,15 +1,14 @@
 #pragma once
-#include "../math/math.h"
 #include "Framebuffer.h"
 #include "font/Fonts.h"
+#include <math/math.h>
 #include <stdint.h>
-#include "../base_utils/userinput/keyboard.h"
-#include "../base_utils/userinput/kbScancode.h"
-#include "../base_utils/interrupts/IDT.h"
-#include "../base_utils/interrupts/interrupts.h"
-#include "../base_utils/interrupts/interrupts.h"
-#include "../base_utils/intnum/cstr.h"
-
+#include <userinput/keyboard.h>
+#include <userinput/kbScancode.h>
+#include <interrupts/IDT.h>
+#include <interrupts/interrupts.h>
+#include <interrupts/interrupts.h>
+#include <intnum/cstr.h>
 
 class KAtaRenderer {
     public:

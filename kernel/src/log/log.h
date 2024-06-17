@@ -1,9 +1,9 @@
 #pragma once
-#include "../kata_renderer/kata_renderer.h"
+#include <kata_renderer.h>
 
-class log {
+class Log {
     public:
-    log();
+    Log();
     void print(const char *str);
     void info(const char *str);
     void ok(const char *str);
@@ -11,4 +11,4 @@ class log {
     void failed(const char *str);
 };
 
-extern log* glog;
+extern Log* log;

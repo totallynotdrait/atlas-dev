@@ -2,20 +2,20 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "kata_renderer/kata_renderer.h"
-#include "base_utils/intnum/cstr.h"
-#include "base_utils/efim/efiMemory.h"
-#include "base_utils/mem/memory.h"
-#include "base_utils/bitmap/bitmap.h"
-#include "base_utils/pageframe/PageFrameAllocator.h"
-#include "base_utils/pageframe/PageMapIndexer.h"
-#include "base_utils/pageframe/paging.h"
-#include "base_utils/pageframe/PageTableManager.h"
-#include "base_utils/userinput/mouse.h"
-#include "base_utils/basesystem.h"
-#include "base_utils/acpi/acpi.h"
-#include "base_utils/hardw/pci.h"
-#include "base_utils/basesystem.h"
+#include <kata_renderer.h>
+#include <intnum/cstr.h>
+#include <efim/efiMemory.h>
+#include <mem/memory.h>
+#include <bitmap/bitmap.h>
+#include <pageframe/PageFrameAllocator.h>
+#include <pageframe/PageMapIndexer.h>
+#include <pageframe/paging.h>
+#include <pageframe/PageTableManager.h>
+#include <userinput/mouse.h>
+#include <basesystem.h>
+#include <acpi/acpi.h>
+#include <hardw/pci.h>
+#include <basesystem.h>
 #include <efi.h>
 #include <log.h>
 

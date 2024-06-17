@@ -24,10 +24,9 @@
 extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
     isKeyboardEnabled = true;
     basesystem bs;
-    log log;
     KAtaInfo kataInfo = InitializeKAta(bootInfo);
     PageTableManager* pageTableManager = kataInfo.pageTableManager;
-    log.ok("Atlas initialized succefully.");
+    log->ok("Atlas initialized succefully.");
     
     bs.reboot(bootInfo);
 
