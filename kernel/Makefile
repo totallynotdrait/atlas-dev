@@ -4,11 +4,11 @@ OSNAME = atlas-dev_xUn
 GNUEFI = ../gnu-efi
 OVMFDIR = ../OVMFbin
 LDS = kata.ld
-CC = gcc
+CC = /usr/local/x86_64elfgcc/bin/x86_64-elf-gcc
 ASMC = nasm
-LD = ld
+LD = /usr/local/x86_64elfgcc/bin/x86_64-elf-ld
 
-CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -I$(GNUEFI)/inc -I$(GNUEFI)/inc/x86_64 -Isrc -Isrc/log -Isrc/inc -Isrc/kata_renderer
+CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -Isrc -Isrc/log -Isrc/inc -Isrc/kata_renderer -fno-exceptions -Isrc/inc/libc
 ASMFLAGS = 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
@@ -30,12 +30,12 @@ kata: $(OBJS) link
 $(OBJDIR)/kata_renderer/kata_renderer.o: $(SRCDIR)/kata_renderer/kata_renderer.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"
 	@mkdir -p $(@D)
-	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -I$(GNUEFI)/inc -I$(GNUEFI)/inc/x86_64 -Isrc/log -Isrc/inc -Isrc/kata_renderer -Isrc -c $^ -o $@
+	$(CC) -mno-red-zone -mgeneral-regs-only -masm=intel -ffreestanding -Isrc/log -Isrc/inc -Isrc/kata_renderer -Isrc/inc/libc -Isrc -c $^ -o $@
 
 $(OBJDIR)/inc/interrupts/interrupts.o: $(SRCDIR)/inc/interrupts/interrupts.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"
 	@mkdir -p $(@D)
-	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -I$(GNUEFI)/inc -I$(GNUEFI)/inc/x86_64 -Isrc/log -Isrc/inc -Isrc/kata_renderer -Isrc -c $^ -o $@
+	$(CC) -mno-red-zone -mgeneral-regs-only -masm=intel -ffreestanding -Isrc/log -Isrc/inc -Isrc/kata_renderer -Isrc -Isrc/inc/libc -c $^ -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"

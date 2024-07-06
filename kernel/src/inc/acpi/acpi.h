@@ -42,4 +42,5 @@ namespace ACPI {
     
 
     void* FindTable(SDTHeader* sdtHeader, char* signature);
+    void* FindTable(SDTHeader* sdtHeader, const char* signature, int div);
 }

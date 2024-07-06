@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-struct KEFI_MEMORY_DESCRIPTOR {
+struct EFI_MEMORY_DESCRIPTOR {
     uint32_t type;
     void* physAddr;
     void* virtAddr;

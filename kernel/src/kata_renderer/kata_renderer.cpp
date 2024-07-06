@@ -1,12 +1,15 @@
 #include "kata_renderer.h"
 
 
+HEXBasicColors hbc;
+bool isMouseCursorVisible = true;
+
 KAtaRenderer* GKRenderer;
 
 KAtaRenderer::KAtaRenderer(FrameBuffer* targetFramebuffer, PSF1_FONT* psf1_Font) {
     TargetFramebuffer = targetFramebuffer;
     PSF1_Font = psf1_Font;
-    Color = 0xffffffff;
+    Color = hbc.Gray;
     CursorPosition = {0, 0};
 }
 
@@ -22,6 +25,8 @@ void KAtaRenderer::Clear(){
             *pixPtr = ClearColor;
         }
     }
+    CursorPosition.X = 0;
+    CursorPosition.Y = 0;
 }
 
 void KAtaRenderer::ClearChar() {
@@ -75,7 +80,7 @@ void KAtaRenderer::scanf(const char* str) {
 }
 
 void KAtaRenderer::putChar(char chr, unsigned int xOff, unsigned int yOff) {
-    if (CursorPosition.X + 8 > TargetFramebuffer->Width) return; // avoid crashing
+    // if (CursorPosition.X + 8 > TargetFramebuffer->Width) GKRenderer->Clear(); // avoid crashing // then why not work maremma sdrumolata
     unsigned int* pixPtr =  (unsigned int*)TargetFramebuffer->BaseAddress;
     char* fontPtr = (char*)PSF1_Font->glyphBuffer + (chr * PSF1_Font->psf1_Header->charsize);
     for (unsigned long y = yOff; y < yOff + 16; y++) {
@@ -131,9 +136,7 @@ void KAtaRenderer::ClearMouseCursor(uint8_t* mouseCursor, Point position) {
     }
 }
 
-void KAtaRenderer::DrawOverlayMouseCurosr(uint8_t* mouseCursor, Point position, uint32_t color) {
-    
-    
+void KAtaRenderer::DrawOverlayMouseCursor(uint8_t* mouseCursor, Point position, uint32_t* colorMap) {
     int xMax = 16;
     int yMax = 16;
     int differenceX = TargetFramebuffer->Width - position.X;
@@ -148,7 +151,7 @@ void KAtaRenderer::DrawOverlayMouseCurosr(uint8_t* mouseCursor, Point position, 
             int byte = bit / 8;
             if ((mouseCursor[byte] & (0b10000000 >> (x % 8)))){
                 MouseCursorBuffer[x + y * 16] = getPix(position.X + x, position.Y + y);
-                putPix(position.X + x, position.Y + y, color);
+                putPix(position.X + x, position.Y + y, colorMap[y * 16 + x]);
                 MouseCursorBufferAfter[x + y * 16] = getPix(position.X + x, position.Y + y);
             }
         }

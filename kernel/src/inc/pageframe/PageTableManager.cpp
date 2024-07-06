@@ -22,8 +22,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory) {
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
         PML4->entries[indexer.PDP_i] = PDE;
-    }
-    else {
+    } else {
         PDP = (PageTable*)((uint64_t)PDE.GetAddress() << 12);
     }
 
@@ -37,8 +36,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory) {
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
         PDP->entries[indexer.PD_i] = PDE;
-    }
-    else {
+    } else {
         PD = (PageTable*)((uint64_t)PDE.GetAddress() << 12);
     }
 
@@ -51,8 +49,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory) {
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
         PD->entries[indexer.PT_i] = PDE;
-    }
-    else {
+    } else {
         PT = (PageTable*)((uint64_t)PDE.GetAddress() << 12);
     }
 

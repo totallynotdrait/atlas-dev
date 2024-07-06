@@ -1,5 +1,6 @@
 #include "panic.h"
-#include "../../kata_renderer/kata_renderer.h"
+#include <kata_renderer.h>
+#include <scheduling/PIT/PIT.h>
 
 void Panic(const char* panicMessage) {
     GKRenderer->ClearColor = 0x000000FF;
@@ -32,13 +33,14 @@ void Panic(const char* panicMessage) {
     GKRenderer->Next();
     GKRenderer->Next();
     GKRenderer->printf("Message from handler: ");
-    GKRenderer->printf(panicMessage);;
+    GKRenderer->printf(panicMessage);
     GKRenderer->Next();
+    GKRenderer->printf("Clock time since startup (PIT, not accurated): ");
+    GKRenderer->printf(to_string(PIT::TimeSinceBoot));
     GKRenderer->Next();
     GKRenderer->Next();
     GKRenderer->Next();
     GKRenderer->printf("Atlas and KAta in general is halted.");
     GKRenderer->Next();
-    GKRenderer->Next();
-    GKRenderer->printf("It's now safe to reboot your system.");
+    GKRenderer->printf("It's now safe to shutdown your system.");
 }

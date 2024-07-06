@@ -28,38 +28,42 @@ void RemoveLastCharacter() {
     }
 }
 
+uint8_t getch() {
+    return inb(0x60);
+} 
+
 void HandleKeyboard(uint8_t scancode) {
 
     if (!isKeyboardEnabled) return;
 
-    switch (scancode)
-    {
-    case LeftShift:
-        isLeftShiftPressed = true;
-        return;
-    case LeftShift + 0x80:
-        isLeftShiftPressed = false;
-        return;
-    
-    case RightShift:
-        isRightShiftPressed = true;
-        return;
-    case RightShift + 0x80:
-        isRightShiftPressed = false;
-        return;
+    switch (scancode) {
+        case LeftShift:
+            isLeftShiftPressed = true;
+            return;
+        case LeftShift + 0x80:
+            isLeftShiftPressed = false;
+            return;
+        
+        case RightShift:
+            isRightShiftPressed = true;
+            return;
+        case RightShift + 0x80:
+            isRightShiftPressed = false;
+            return;
 
-    case Enter:
-        /* GKRenderer->Next(); */
-        return;
+        case Enter:
+            GKRenderer->Next();
+            return;
 
-    case Spacebar:
-        AddCharacter(' ');
-        return;
+        case Spacebar:
+            AddCharacter(' ');
+            return;
 
-    case Backspace:
-        RemoveLastCharacter();
-        return;
+        case Backspace:
+            RemoveLastCharacter();
+            return;
     }
+
     char ascii = QWERTYKeyboard::Translate(scancode, isLeftShiftPressed | isRightShiftPressed);
 
     if (ascii != 0) {

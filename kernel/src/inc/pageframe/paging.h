@@ -12,7 +12,7 @@ enum PT_Flag {
     Custom0 = 9,
     Custom1 = 10,
     Custom2 = 11,
-    NX = 63, // only if supported by system
+    NX = 63 // only if supported by system
 };
 
 struct PageDirectoryEntry {

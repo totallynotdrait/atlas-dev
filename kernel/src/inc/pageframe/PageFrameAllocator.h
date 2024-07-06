@@ -7,7 +7,7 @@
 
 class PageFrameAllocator {
     public:
-    void ReadEFIMemoryMap(KEFI_MEMORY_DESCRIPTOR* mMap, size_t mMapSize, size_t mMapDescSize);
+    void ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mMapSize, size_t mMapDescSize);
     Bitmap PageBitmap;
     void FreePage(void* address);
     void FreePages(void* address, uint64_t pageCount);

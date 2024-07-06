@@ -41,7 +41,7 @@ FrameBuffer* InitializeGOP() {
 		Print(L"KATA:BOOTLOADER:PANIC: Could now locate GOP from initGOP\n\r");
 		return NULL;
 	} else {
-		Print(L"InitGOP success\n\r");
+		// Print(L"InitGOP success\n\r");
 	}
 
 	framebuffer.BaseAddress = (void*)gop->Mode->FrameBufferBase;
@@ -111,7 +111,7 @@ PSF1_FONT* LoadPSF1Font(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandl
 int memcmp (const void* aptr, const void* bptr, size_t n) {
 	const unsigned char* a = aptr, *b = bptr;
 	for (size_t i = 0; i < n; i++) {
-		if (a[i] < b[i]) return 1;
+		if (a[i] < b[i]) return -1;
 		else if (a[i] > b[i]) return 1;
 	}
 	return 0;
@@ -124,7 +124,6 @@ typedef struct {
 	UINTN mMapSize;
 	UINTN mMapDescSize;
 	void* rsdp;
-	EFI_SYSTEM_TABLE SystemTable;
 } BootInfo;
 
 UINTN strcmp(CHAR8* a, CHAR8* b, UINTN length) {
@@ -136,13 +135,13 @@ UINTN strcmp(CHAR8* a, CHAR8* b, UINTN length) {
 
 EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	InitializeLib(ImageHandle, SystemTable);
-	Print(L"\n\r[Atlas UEFI Bootloader (kata_bootloader-xUn)]\n\r");
-
+	Print(L"\n\r[Atlas UEFI Bootloader (kata_bootloader-x86_64)]\n\r");
+	Print(L"Loading KAta-x86_64...");
 	EFI_FILE* KAta = LoadFile(NULL, L"kata.elf", ImageHandle, SystemTable);
-	if (LoadFile(NULL, L"kata.elf", ImageHandle, SystemTable) == NULL) {
-		Print(L"\n\rKATA:BOOTLOADER:PANIC: Could not load KAta, i guess we're just here alone, you and me >:3\n\r");
+	if (KAta == NULL) {
+		Print(L"\n\rCould not load KAta, i guess we're just here alone, you and me >:3\n\r");
 	} else {
-		Print(L"\n\rLoaded KAta\n\r");
+		// Print(L"\n\rLoaded KAta\n\r");
 	}
 
 	Elf64_Ehdr header;
@@ -162,13 +161,14 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		memcmp(&header.e_ident[EI_MAG0], ELFMAG, SELFMAG) != 0 ||
 		header.e_ident[EI_CLASS] != ELFCLASS64 ||
 		header.e_ident[EI_DATA] != ELFDATA2LSB ||
+		header.e_type != ET_EXEC ||
 		header.e_machine != EM_X86_64 ||
 		header.e_version != EV_CURRENT
 	) {
-		Print(L"Kernel format is init (bad)\r\n");
+		Print(L"Kernel format is incompatible, kernel needs to be recompiled\r\n");
 	}
 	else {
-		Print(L"Kernel format is ok\r\n");
+		//Print(L"Kernel format is ok\r\n");
 	}
 
 	Elf64_Phdr* phdrs;
@@ -177,39 +177,41 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		UINTN size = header.e_phnum * header.e_phentsize;
 		SystemTable->BootServices->AllocatePool(EfiLoaderData, size, (void**)&phdrs);
 		KAta->Read(KAta, &size, phdrs);
+	}
 
-		for (
-			Elf64_Phdr* phdr = phdrs;
-			(char*)phdr < (char*)phdrs + header.e_phnum * header.e_phentsize;
-			phdr = (Elf64_Phdr*)((char*)phdr + header.e_phentsize)
-		)
-		{
-			switch ( (phdr->p_type)) {
-				case PT_LOAD:
-					int pages = (phdr->p_memsz + 0x1000 - 1) / 0x1000;
-					Elf64_Addr segment = phdr->p_paddr;
-					SystemTable->BootServices->AllocatePages(AllocateAddress, EfiLoaderData, pages, &segment);
-					KAta->SetPosition(KAta, phdr->p_offset);
-					UINTN size = phdr->p_filesz;
-					KAta->Read(KAta, &size, (void*)segment);
-					break;
+	for (
+		Elf64_Phdr* phdr = phdrs;
+		(char*)phdr < (char*)phdrs + header.e_phnum * header.e_phentsize;
+		phdr = (Elf64_Phdr*)((char*)phdr + header.e_phentsize)
+	)
+	{
+		switch (phdr->p_type) {
+			case PT_LOAD:
+			{
+				int pages = (phdr->p_memsz + 0x1000 - 1) / 0x1000;
+				Elf64_Addr segment = phdr->p_paddr;
+				SystemTable->BootServices->AllocatePages(AllocateAddress, EfiLoaderData, pages, &segment);
+				KAta->SetPosition(KAta, phdr->p_offset);
+				UINTN size = phdr->p_filesz;
+				KAta->Read(KAta, &size, (void*)segment);
+				break;
 			}
 		}
 	}
 
-	Print(L"KAta Loaded\n\r");
+	//Print(L"KAta Loaded\n\r");
 
-	PSF1_FONT* newFont = LoadPSF1Font(NULL, L"zap-light16.psf", ImageHandle, SystemTable);
+	PSF1_FONT* newFont = LoadPSF1Font(NULL, L"zap-vga16.psf", ImageHandle, SystemTable);
 	if (newFont == NULL) {
 		Print(L"Invalid font or binary not found\n");
 	} else {
-		Print(L"Font found. char size = %d\n\r", newFont->psf1_Header->charsize);
+		//Print(L"Font found. char size = %d\n\r", newFont->psf1_Header->charsize);
 	}
 
 	
 	FrameBuffer* newBuffer = InitializeGOP();
 
-	Print(L"Base: 0x%x\n\rSize: 0x%\n\rWidth: %d\n\rHeight: %d\n\rPixelsPerScanline: %d\n\r\n\r",newBuffer->BaseAddress,newBuffer->BufferSize,newBuffer->Width,newBuffer->Height,newBuffer->PixelsPerScanline);
+	//Print(L"Base: 0x%x\n\rSize: 0x%\n\rWidth: %d\n\rHeight: %d\n\rPixelsPerScanline: %d\n\r\n\r",newBuffer->BaseAddress,newBuffer->BufferSize,newBuffer->Width,newBuffer->Height,newBuffer->PixelsPerScanline);
 
 	EFI_MEMORY_DESCRIPTOR* Map = NULL;
 	UINTN MapSize, MapKey;
@@ -247,7 +249,6 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.mMapSize = MapSize;
 	bootInfo.mMapDescSize = DescriptorSize;
 	bootInfo.rsdp = rsdp;
-	bootInfo.SystemTable = *SystemTable;
 
 	SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
 

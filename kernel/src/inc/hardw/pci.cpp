@@ -1,4 +1,6 @@
 #include "pci.h"
+#include <drivers/AHCI/AHCI.h>
+#include <mem/heap.h>
 
 namespace PCI {
     void EnumerateFunction(uint64_t deviceAddress, uint64_t function) {
@@ -22,7 +24,16 @@ namespace PCI {
         GKRenderer->printf(GetProgIFName(pciDeviceHeader->ProgIF, pciDeviceHeader->Class, pciDeviceHeader->Subclass));
         GKRenderer->Next(); */
 
-
+        switch (pciDeviceHeader->Class) {
+            case 0x01:
+                switch (pciDeviceHeader->Subclass) {
+                    case 0x06:
+                        switch (pciDeviceHeader->ProgIF) {
+                            case 0x01:
+                                new AHCI::AHCIDriver(pciDeviceHeader);
+                        }
+                    }
+        }
     }
 
     void EnumerateDevice(uint64_t busAddress, uint64_t device) {

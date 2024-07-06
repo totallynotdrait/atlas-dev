@@ -3,7 +3,11 @@
 
 #define IDT_TA_InterruptGate    0b10001110
 #define IDT_TA_CallGate         0b10001100
-#define IDT_TA_TarpGate         0b10001111
+#define IDT_TA_TrapGate         0b10001111
+
+#define IDT_FLAG_PRESENT        0b10000000
+#define IDT_FLAG_RING0          0b00000000
+#define IDT_FLAG_RING3          0b01100000
 
 struct IDTDescEntry {
     uint16_t offset0;

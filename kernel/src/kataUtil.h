@@ -16,17 +16,23 @@
 #include <acpi/acpi.h>
 #include <hardw/pci.h>
 #include <basesystem.h>
-#include <efi.h>
 #include <log.h>
+#include <gdt/gdt.h>
+#include <interrupts/IDT.h>
+#include <interrupts/interrupts.h>
+#include <IO/IO.h>
+#include <panic/panic.h>
+#include <aagui/rendering/BasicColors.h>
+#include <mem/heap.h>
+#include <aagui/aagui.h>
 
 struct BootInfo {
 	FrameBuffer* framebuffer;
 	PSF1_FONT* psf1_Font;
-	KEFI_MEMORY_DESCRIPTOR* mMap;
+	EFI_MEMORY_DESCRIPTOR* mMap;
 	uint64_t mMapSize;
 	uint64_t mMapDescSize;
 	ACPI::RSDP2* rsdp;
-	EFI_SYSTEM_TABLE *SystemTable;
 };
 
 extern uint64_t _KAtaStart;
@@ -37,4 +43,8 @@ struct KAtaInfo {
     PageTableManager* pageTableManager;
 };
 
-KAtaInfo InitializeKAta(BootInfo* BootInfo);
+extern KAtaInfo kataInfo;
+void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t selector);
+void PrepareInterrupts();
+void PrepareACPI(BootInfo* BootInfo);
+void PrepareMemory(BootInfo* bootInfo);

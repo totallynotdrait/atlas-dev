@@ -16,19 +16,40 @@
         Operating System Development Discord Server for the little help.
 */
 
-//https://www.youtube.com/watch?v=e47SApmmx44&list=PLxN4E629pPnJxCQCLy7E0SQY_zuumOVyZ&index=8&ab_channel=Poncho
-//(36:08)
-
-#include "kataUtil.h"
+#include "kataInit.h"
+#include <scheduling/PIT/PIT.h>
+#include <aagui/window/window.h>
+#include <syscall/syscall.h>
+#include <libc/include/stdio.h>
 
 extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
-    isKeyboardEnabled = true;
-    basesystem bs;
     KAtaInfo kataInfo = InitializeKAta(bootInfo);
-    PageTableManager* pageTableManager = kataInfo.pageTableManager;
+
+    // main
+    GKRenderer->Clear();
     log->ok("Atlas initialized succefully.");
     
-    bs.reboot(bootInfo);
+    /* GKRenderer->Clear();
+    GKRenderer->printf("[Welcome to "); GKRenderer->Color = bc.Cyan; GKRenderer->printf("Atlas-xUn"); GKRenderer->Color = bc.White; GKRenderer->printf("]");
+    GKRenderer->Next();
+    GKRenderer->printf("Atlas succefully booted to KAta with no errors, maybe.");
+    GKRenderer->Next();
+    GKRenderer->Next();
+    GKRenderer->printf("If mouse and keyboard are not working, it would probably because you're using a USB keyboard and mouse that Atlas doesn't currently support.");
+    GKRenderer->Next();
+    GKRenderer->printf("If for some reason boot-loops (which is impossible to read this text) it mostly cause because not enough sectors are read into memory.");
+    GKRenderer->Next();
+    GKRenderer->Next();
+    GKRenderer->printf("You are using atlas-dev, which is a preview of atlas before a official release, but it may be unstable and cause crashes.");
+    GKRenderer->Next();
+    GKRenderer->Next(); */
+    
+    GKRenderer->printf("Press any key to continue..."); GKRenderer->Next();
+    uint8_t uchar = getch();
 
-    while (true);
+    log->print(to_hexstring(uchar));
+
+    while (true) {
+        asm ("hlt");
+    }
 }

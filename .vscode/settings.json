@@ -63,6 +63,8 @@
     "*.phs": "shellscript",
     "*.pyl": "shellscript",
     "#INFO": "yaml",
-    "cstdint": "cpp"
+    "cstdint": "cpp",
+    "compare": "cpp",
+    "cstddef": "cpp"
   }
 }

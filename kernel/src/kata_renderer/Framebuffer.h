@@ -1,7 +1,7 @@
 #pragma once
 #include <stddef.h>
 
-struct FrameBuffer{
+struct FrameBuffer {
 	void* BaseAddress;
 	size_t BufferSize;
 	unsigned int Width;

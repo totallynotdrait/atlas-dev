@@ -11,24 +11,51 @@
 
 
 #include "mouse.h"
+#include <aagui/rendering/BasicColors.h>
 
-uint8_t MousePointer[] = {
-    0b11000000, 0b00000001, 
-    0b10100000, 0b00000001, 
-    0b10010000, 0b00000001, 
-    0b10001000, 0b00000001, 
-    0b10000100, 0b00000001, 
-    0b10000010, 0b00000001, 
-    0b10000001, 0b00000001, 
-    0b10000000, 0b10000001, 
-    0b10000000, 0b01000001, 
-    0b10000000, 0b00100001, 
-    0b10000000, 0b00010001, 
-    0b10000000, 0b00001001, 
-    0b10000000, 0b00000101, 
-    0b10000000, 0b00000011, 
-    0b10000000, 0b00000001, 
-    0b10000000, 0b00000001, 
+DBasicColors dbc;
+
+bool LeftClicked;
+bool MiddleClicked;
+bool RightClicked;
+
+uint32_t MousePointerMap[] = {
+    dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.White, dbc.Blue, dbc.Blue, dbc.Blue, dbc.Blue, dbc.Blue, dbc.Blue, dbc.Blue, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.White, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    dbc.Blue, dbc.Blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+
+uint8_t MousePointerBitmap[] = {
+    0b10000000, 0b00000000, 
+    0b11000000, 0b00000000, 
+    0b11100000, 0b00000000, 
+    0b11110000, 0b00000000, 
+    0b11111000, 0b00000000, 
+    0b11111100, 0b00000000, 
+    0b11111110, 0b00000000, 
+    0b11111111, 0b00000000, 
+    0b11111111, 0b10000000, 
+    0b11111111, 0b11000000, 
+    0b11111111, 0b11100000, 
+    0b11111111, 0b11110000, 
+    0b11111000, 0b00000000, 
+    0b11110000, 0b00000000, 
+    0b11100000, 0b00000000, 
+    0b11000000, 0b00000000, 
 };
 
 void MouseWait() {
@@ -77,7 +104,7 @@ void HandlePS2Mouse(uint8_t data) {
     switch (mouseCycle) {
         case 0:
             
-            if (data & 0b00001000 == 0) break;
+            if ((data & 0b00001000) == 0) break;
             MousePacket[0] = data;
             mouseCycle++;
             break;
@@ -150,20 +177,31 @@ void ProcessMousePacket() {
         if (MousePosition.Y < 0) MousePosition.Y = 0;
         if (MousePosition.Y > GKRenderer->TargetFramebuffer->Height-1) MousePosition.Y = GKRenderer->TargetFramebuffer->Height-1;
         
-        GKRenderer->ClearMouseCursor(MousePointer, MousePositionOld);
-        GKRenderer->DrawOverlayMouseCurosr(MousePointer, MousePosition, 0xffffffff);
+        // render the cursor, the mouse position will still work
+        if (isMouseCursorVisible) {
+            GKRenderer->ClearMouseCursor(MousePointerBitmap, MousePositionOld);
+            GKRenderer->DrawOverlayMouseCursor(MousePointerBitmap, MousePosition, MousePointerMap);
+        }
 
         if (MousePacket[0] & PS2Leftbutton) {
-            
+            LeftClicked = true;
+            showMouseCursor();
+        } else {
+            LeftClicked = false;
         }
 
         if (MousePacket[0] & PS2Middlebutton) {
-            
-            
+            MiddleClicked = true;
+            GKRenderer->printf(to_hexstring((uint8_t)MiddleClicked));
+        } else {
+            MiddleClicked = false;
         }
-
+        
         if (MousePacket[0] & PS2Rightbutton) {
-            GKRenderer->printf("LLLLLLLLLLLLLLLLLEEEEEEEEEEEEEEEEEEEEEFFFFFFFFFFFFFFFFFFFTTTTTTTTTTTTTTTTTTT");
+            RightClicked = true;
+            hideMouseCursor();
+        } else {
+            RightClicked = false;
         }
 
         MousePacketReady = false;
@@ -189,4 +227,13 @@ void InitPS2Mouse() {
     MouseWrite(0xF4);
     MouseRead();
     log->ok("Initialized PS2 Mouse.");
+}
+
+void showMouseCursor() {
+    isMouseCursorVisible = true;
+}
+
+void hideMouseCursor() {
+    isMouseCursorVisible = false;
+    GKRenderer->ClearMouseCursor(MousePointerBitmap, MousePositionOld);
 }

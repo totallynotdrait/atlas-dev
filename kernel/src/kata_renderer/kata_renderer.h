@@ -9,6 +9,10 @@
 #include <interrupts/interrupts.h>
 #include <interrupts/interrupts.h>
 #include <intnum/cstr.h>
+#include <inc/userinput/mouse.h>
+#include <aagui/rendering/BasicColors.h>
+
+extern bool isMouseCursorVisible;
 
 class KAtaRenderer {
     public:
@@ -29,10 +33,10 @@ class KAtaRenderer {
     void ClearChar();
     void Clear();
     void Next();
-    void Scroll();
-    void DrawOverlayMouseCurosr(uint8_t* mouseCursor, Point position, uint32_t color);
+    void DrawOverlayMouseCursor(uint8_t* mouseCursor, Point position, uint32_t* colorMap);
     void ClearMouseCursor(uint8_t* mouseCursor, Point position);
     bool MouseDrawn;
+    
 };
 
 extern KAtaRenderer* GKRenderer;
