@@ -12,4 +12,5 @@ namespace PIT {
     uint64_t GetFrequency();
     void SetFrequency(uint64_t frequency);
     void Tick();
+    void set_pit_channel_mode_frequency(const uint8_t channel, const uint8_t operating_mode, const uint16_t frequency);
 }

@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Facil/atlas-dev/kernel/src/inc/syscall",
-      "program": "c:/Users/Facil/atlas-dev/kernel/src/inc/syscall/build/Debug/outDebug",
+      "cwd": "c:/Users/Facil/atlas-dev/kernel/src",
+      "program": "c:/Users/Facil/atlas-dev/kernel/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

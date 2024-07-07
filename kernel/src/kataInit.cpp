@@ -66,6 +66,7 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 
 	asm ("sti");
 
+	bs.playBootSound("beep");
 	
 	log->ok("KAta ready.");
 	

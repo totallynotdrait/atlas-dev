@@ -25,6 +25,7 @@
 #include <aagui/rendering/BasicColors.h>
 #include <mem/heap.h>
 #include <aagui/aagui.h>
+#include <sound/pc_speaker.h>
 
 struct BootInfo {
 	FrameBuffer* framebuffer;

@@ -4,6 +4,7 @@
 #include <userinput/keyboard.h>
 #include <scheduling/PIT/PIT.h>
 #include <syscall/syscallEnvList.h>
+#include <liba/stdio.h>
 
 __attribute__((interrupt)) void syscall_Handler(interrupt_frame* frame) {
     int syscall = frame->rax;
@@ -138,6 +139,10 @@ __attribute__((interrupt)) void SE_Handler(interrupt_frame* frame) {
 __attribute__((interrupt)) void KeyboardInt_Handler(interrupt_frame* frame) {
     uint8_t scancode = inb(0x60);
     HandleKeyboard(scancode);
+
+    KeyboardInfo *key_info = (KeyboardInfo *)KEY_INFO_ADDRESS;
+    
+    
     PIC_EndMaster();
 }
 __attribute__((interrupt)) void MouseInt_Handler(interrupt_frame* frame) {

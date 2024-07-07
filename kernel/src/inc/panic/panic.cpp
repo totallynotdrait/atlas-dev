@@ -3,9 +3,9 @@
 #include <scheduling/PIT/PIT.h>
 
 void Panic(const char* panicMessage) {
-    GKRenderer->ClearColor = 0x000000FF;
+    GKRenderer->ClearColor = hbc.Blue;
     GKRenderer->CursorPosition = {0,0};
-    GKRenderer->Color = 0xFFFFFFFF;
+    GKRenderer->Color = hbc.White;
     GKRenderer->Clear();
     GKRenderer->printf("HALT KERNEL PANIC");
     GKRenderer->Next();

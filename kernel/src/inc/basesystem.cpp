@@ -1,6 +1,7 @@
 #include "basesystem.h"
 #include <IO/IO.h>
 #include <scheduling/PIT/PIT.h>
+#include <liba/string.h>
 
 #define KBRD_INTRFC 0x64
 
@@ -101,4 +102,30 @@ void basesystem::enableFPU() {
 	asm volatile ("mov %0, %%cr4" :: "r"(cr4));
 	basesystem::set_fpu_cw(0x37F);
     log->ok("Enabled Floating Point Unit (FPU)");
+}
+
+void basesystem::playBootSound(const char* boot) {
+    if (strcmp(boot, "cieli_neri") == 0) {
+        enable_pc_speaker();
+
+        set_bpm(158);
+        play_note(NoteFrequency::Ab4, 1130); // 68
+        play_note(NoteFrequency::B4, 1130); // 71
+        play_note(NoteFrequency::E5, 750); // 76
+        play_note(NoteFrequency::E4, 2270);
+        play_note(NoteFrequency::A4, 750);
+        play_note(NoteFrequency::G4, 190);
+        play_note(NoteFrequency::Gb4, 190);
+        play_note(NoteFrequency::E4, 1890);
+        play_note(NoteFrequency::D4, 750);
+        play_note(NoteFrequency::B3, 3030);
+
+        disable_pc_speaker();
+    } else if (strcmp(boot, "beep") == 0) {
+        enable_pc_speaker();
+        play_note(NoteFrequency::A4, 1050);
+        disable_pc_speaker();
+    } else {
+        log->failed("No boot sound, unknown boot sound.");
+    }
 }

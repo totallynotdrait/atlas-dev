@@ -17,16 +17,12 @@
 */
 
 #include "kataInit.h"
-#include <scheduling/PIT/PIT.h>
-#include <aagui/window/window.h>
-#include <syscall/syscall.h>
-#include <libc/include/stdio.h>
+#include "shell/shell.h"
 
 extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
     KAtaInfo kataInfo = InitializeKAta(bootInfo);
 
     // main
-    GKRenderer->Clear();
     log->ok("Atlas initialized succefully.");
     
     /* GKRenderer->Clear();
@@ -43,11 +39,13 @@ extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
     GKRenderer->printf("You are using atlas-dev, which is a preview of atlas before a official release, but it may be unstable and cause crashes.");
     GKRenderer->Next();
     GKRenderer->Next(); */
-    
-    GKRenderer->printf("Press any key to continue..."); GKRenderer->Next();
-    uint8_t uchar = getch();
 
-    log->print(to_hexstring(uchar));
+    /* printf("Press any key to continue...");
+    GKRenderer->Next();
+    uint8_t key = getch();
+    printf("Key: %x\n", key); */
+
+    //init_ata_shell();
 
     while (true) {
         asm ("hlt");

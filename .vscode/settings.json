@@ -65,6 +65,8 @@
     "#INFO": "yaml",
     "cstdint": "cpp",
     "compare": "cpp",
-    "cstddef": "cpp"
-  }
+    "cstddef": "cpp",
+    "random": "cpp"
+  },
+  "C_Cpp.errorSquiggles": "enabled"
 }
