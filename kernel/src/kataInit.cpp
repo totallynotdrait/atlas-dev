@@ -62,8 +62,6 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 	outb(PIC1_DATA, 0b11111000);
 	outb(PIC2_DATA, 0b11101111);
 
-
-
 	asm ("sti");
 
 	bs.playBootSound("beep");

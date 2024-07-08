@@ -45,7 +45,7 @@ namespace PCI {
 
     const char* GetDeviceName(uint16_t vendorID, uint16_t deviceID) {
         switch (vendorID) {
-            case 0x8086:
+            case 0x8086: // intel
             switch (deviceID) {
                 case 0x29C0:
                     return "Express DRAM Controller";
@@ -73,6 +73,12 @@ namespace PCI {
                     return "Tiger Lake-H SMBus Controller";
                 case 0x43A4:
                     return "Tiger Lake-H SPI Controller";
+                case 0x100E:
+                    return "82540EM Gigabit Ethernet Controller";
+                case 0x153A:
+                    return "Ethernet Connection I217-LM";
+                case 0x10EA:
+                    return "82577LM Gigabit Network Connection";
             }
         }
         return to_hexstring(deviceID);

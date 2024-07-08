@@ -3,7 +3,6 @@
 #include <IO/IO.h>
 #include <userinput/keyboard.h>
 #include <scheduling/PIT/PIT.h>
-#include <syscall/syscallEnvList.h>
 #include <liba/stdio.h>
 
 __attribute__((interrupt)) void syscall_Handler(interrupt_frame* frame) {

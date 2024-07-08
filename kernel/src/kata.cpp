@@ -40,12 +40,7 @@ extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
     GKRenderer->Next();
     GKRenderer->Next(); */
 
-    /* printf("Press any key to continue...");
-    GKRenderer->Next();
-    uint8_t key = getch();
-    printf("Key: %x\n", key); */
-
-    //init_ata_shell();
+    init_ata_shell();
 
     while (true) {
         asm ("hlt");

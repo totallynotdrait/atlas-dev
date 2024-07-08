@@ -8,7 +8,7 @@ CC = /usr/local/x86_64elfgcc/bin/x86_64-elf-gcc
 ASMC = nasm
 LD = /usr/local/x86_64elfgcc/bin/x86_64-elf-ld
 
-CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -Isrc -Isrc/log -Isrc/inc -Isrc/kata_renderer -fno-exceptions -Isrc/inc/libc
+CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -Isrc -Isrc/log -Isrc/inc -Isrc/kata_renderer -fno-exceptions -Isrc/inc/libc -fno-rtti
 ASMFLAGS = 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 

@@ -29,3 +29,24 @@ void io_wait(uint64_t us)
     while(us--)
         io_wait();
 }
+
+uint16_t inw(uint16_t port) 
+{
+    uint16_t result;
+    asm("in %%dx, %%ax" : "=a" (result) : "d" (port));
+    return result;
+}
+
+
+uint32_t inl(uint32_t port) 
+{
+    uint32_t result;
+    asm volatile("inl %%dx, %%eax" : "=a" (result) : "d"(port));
+    return result;
+}
+
+
+void outl(uint32_t port, uint32_t value) 
+{
+	asm volatile("outl %%eax, %%dx" :: "d" (port), "a" (value));
+}

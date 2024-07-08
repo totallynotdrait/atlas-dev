@@ -10,6 +10,7 @@ namespace QWERTYKeyboard {
     #define Backspace 0x0E
     #define Spacebar 0x39
 
+    extern const char* loadedKeys;
     extern const char ASCIITable[];
     char Translate(uint8_t scancode, bool uppercase);
 }

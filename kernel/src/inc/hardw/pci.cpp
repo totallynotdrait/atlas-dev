@@ -1,6 +1,7 @@
 #include "pci.h"
 #include <drivers/AHCI/AHCI.h>
 #include <mem/heap.h>
+#include <IO/IO.h>
 
 namespace PCI {
     void EnumerateFunction(uint64_t deviceAddress, uint64_t function) {
@@ -13,7 +14,7 @@ namespace PCI {
         if (pciDeviceHeader->DeviceID == 0) return;
         if (pciDeviceHeader->DeviceID == 0xFFFF) return;  
 
-        GKRenderer->printf(GetVendorName(pciDeviceHeader->VendorID));
+        /* GKRenderer->printf(GetVendorName(pciDeviceHeader->VendorID));
         GKRenderer->printf(" / ");
         GKRenderer->printf(GetDeviceName(pciDeviceHeader->VendorID, pciDeviceHeader->DeviceID));
         GKRenderer->printf(" / ");
@@ -22,7 +23,7 @@ namespace PCI {
         GKRenderer->printf(GetSubclassName(pciDeviceHeader->Class, pciDeviceHeader->Subclass));
         GKRenderer->printf(" / ");
         GKRenderer->printf(GetProgIFName(pciDeviceHeader->ProgIF, pciDeviceHeader->Class, pciDeviceHeader->Subclass));
-        GKRenderer->Next();
+        GKRenderer->Next(); */
 
         switch (pciDeviceHeader->Class) {
             case 0x01:
@@ -33,6 +34,23 @@ namespace PCI {
                                 new AHCI::AHCIDriver(pciDeviceHeader);
                         }
                     }
+            case 0x0C: // Serial BUS Controller
+                switch (pciDeviceHeader->Subclass) {
+                    case 0x03: // USB Controller
+                        switch (pciDeviceHeader->ProgIF) {
+                            case 0x00: // UHCI
+                                break;
+
+                            case 0x10: //OHCI
+                                break;
+
+                            case 0x20: //EHCI
+                                break;
+
+                            case 0x30: //XHCI
+                                break;
+                        }
+                }
         }
     }
 
@@ -73,6 +91,97 @@ namespace PCI {
             for (uint64_t bus = newDeviceConfig->StartBus; bus < newDeviceConfig->EndBus; bus++) {
                 EnumerateBus(newDeviceConfig->BaseAddress, bus);
             }
+        }
+    }
+
+    uint8_t Read8(uint32_t id, uint32_t reg)
+    {
+        uint32_t addr = 0x80000000 | id | (reg & 0xfc);
+        outl(PCI_CONFIG_ADDR, addr);
+        return inb(PCI_CONFIG_DATA + (reg & 0x03));
+    }
+
+    uint16_t Read16(uint32_t id, uint32_t reg)
+    {
+        uint32_t addr = 0x80000000 | id | (reg & 0xfc);
+        outl(PCI_CONFIG_ADDR, addr);
+        return inw(PCI_CONFIG_DATA + (reg & 0x02));
+    }
+
+    uint32_t Read32(uint32_t id, uint32_t reg)
+    {
+        uint32_t addr = 0x80000000 | id | (reg & 0xfc);
+        outl(PCI_CONFIG_ADDR, addr);
+        return inl(PCI_CONFIG_DATA);
+    }
+
+    void Write8(uint32_t id, uint32_t reg, uint8_t data)
+    {
+        uint32_t address = 0x80000000 | id | (reg & 0xfc);
+        outl(PCI_CONFIG_ADDR, address);
+        outb(PCI_CONFIG_DATA + (reg & 0x03), data);
+    }
+
+    void Write16(uint32_t id, uint32_t reg, uint16_t data)
+    {
+        uint32_t address = 0x80000000 | id | (reg & 0xfc);
+        outl(PCI_CONFIG_ADDR, address);
+        outw(PCI_CONFIG_DATA + (reg & 0x02), data);
+    }
+
+    void Write32(uint32_t id, uint32_t reg, uint32_t data)
+    {
+        uint32_t address = 0x80000000 | id | (reg & 0xfc);
+        outl(PCI_CONFIG_ADDR, address);
+        outl(PCI_CONFIG_DATA, data);
+    }
+
+    void ReadBar(uint32_t id, uint32_t index, uint32_t* address, uint32_t* mask)
+    {
+        uint32_t reg = PCI_CONFIG_BAR0 + index * sizeof(uint32_t);
+
+        // Get the address
+        *address = Read32(id, reg);
+
+        // Find out size of the bar
+        Write32(id, reg, 0xffffffff);
+        *mask = Read32(id, reg);
+
+        // Restore adddress
+        Write32(id, reg, *address);
+    }
+
+    void GetBar(BaseAddressRegister* bar, uint32_t id, uint32_t index)
+    {
+        // Read pci bar register
+        uint32_t addressLow;
+        uint32_t maskLow;
+        ReadBar(id, index, &addressLow, &maskLow);
+
+        if (addressLow & PCI_BAR_64)
+        {
+            // 64-bit mmio
+            uint32_t addressHigh;
+            uint32_t maskHigh;
+            ReadBar(id, index + 1, &addressHigh, &maskHigh);
+
+            bar->address = (void*)(((uint64_t)addressHigh << 32) | (addressLow & ~0xf));
+            bar->size = ~(((uint64_t)maskHigh << 32) | (maskLow & ~0xf)) + 1;
+            bar->flags = addressLow & 0xf;
+        }
+        else if (addressLow & PCI_BAR_IO)
+        {
+            // i/o register
+            bar->port = (uint16_t)(addressLow & ~0x3);
+            bar->size = (uint16_t)(~(maskLow & ~0x3) + 1);
+            bar->flags = addressLow & 0x3;
+        }
+        else
+        {
+            // 32-bit mmio
+            bar->address = (void *)(uint64_t)(addressLow & ~0xf);
+            bar->size = ~(maskLow & ~0xf) + 1;
+            bar->flags = addressLow & 0xf;
         }
     }
 }
