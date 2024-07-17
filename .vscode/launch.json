@@ -1,24 +1,39 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {
-      "name": "C/C++ Runner: Debug Session",
-      "type": "cppdbg",
-      "request": "launch",
-      "args": [],
-      "stopAtEntry": false,
-      "externalConsole": true,
-      "cwd": "c:/Users/Facil/atlas-dev/kernel/src",
-      "program": "c:/Users/Facil/atlas-dev/kernel/src/build/Debug/outDebug",
-      "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
-    }
+      {
+          "name": "Debug Kernel",
+          "type": "cppdbg",
+          "request": "launch",
+          "program": "${workspaceRoot}/kernel/bin/kata.elf",
+          "args": [],
+          "stopAtEntry": false,
+          "cwd": "${workspaceFolder}",
+          "environment": [],
+          "externalConsole": false,
+          "MIMode": "gdb",
+          "setupCommands": [
+              {
+                  "description": "Enable pretty-printing for gdb",
+                  "text": "-enable-pretty-printing",
+                  "ignoreFailures": true
+              }
+          ],
+          "preLaunchTask": "Launch Qemu",
+          "miDebuggerPath": "/usr/bin/gdb",
+          "miDebuggerArgs": "",
+          "targetArchitecture": "x86_64",
+          "customLaunchSetupCommands": [
+              {
+                  "text": "target remote localhost:1234",
+                  "description": "Connect to QEMU remote debugger"
+              },
+              {
+                  "text": "symbol-file kernel.elf",
+                  "description": "Get kernel symbols"
+              }
+          ],
+          "avoidWindowsConsoleRedirection": true
+      }
   ]
 }

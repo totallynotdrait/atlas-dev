@@ -32,9 +32,12 @@ class KAtaRenderer {
     uint32_t getPix(uint32_t x, uint32_t y);
     void ClearChar();
     void Clear();
+    void scroll_up(FrameBuffer fb);
     void Next();
     void DrawOverlayMouseCursor(uint8_t* mouseCursor, Point position, uint32_t* colorMap);
     void ClearMouseCursor(uint8_t* mouseCursor, Point position);
+    void drawCursor(bool on);
+    void paint();
     bool MouseDrawn;
     
 };

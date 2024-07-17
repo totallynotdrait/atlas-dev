@@ -177,29 +177,26 @@ void ProcessMousePacket() {
         if (MousePosition.Y < 0) MousePosition.Y = 0;
         if (MousePosition.Y > GKRenderer->TargetFramebuffer->Height-1) MousePosition.Y = GKRenderer->TargetFramebuffer->Height-1;
         
-        // render the cursor, the mouse position will still work
+        /* // render the cursor, the mouse position will still work
         if (isMouseCursorVisible) {
             GKRenderer->ClearMouseCursor(MousePointerBitmap, MousePositionOld);
             GKRenderer->DrawOverlayMouseCursor(MousePointerBitmap, MousePosition, MousePointerMap);
-        }
+        } */
 
         if (MousePacket[0] & PS2Leftbutton) {
             LeftClicked = true;
-            showMouseCursor();
         } else {
             LeftClicked = false;
         }
 
         if (MousePacket[0] & PS2Middlebutton) {
             MiddleClicked = true;
-            GKRenderer->printf(to_hexstring((uint8_t)MiddleClicked));
         } else {
             MiddleClicked = false;
         }
         
         if (MousePacket[0] & PS2Rightbutton) {
             RightClicked = true;
-            hideMouseCursor();
         } else {
             RightClicked = false;
         }

@@ -9,6 +9,7 @@ namespace QWERTYKeyboard {
     #define Enter 0x1C
     #define Backspace 0x0E
     #define Spacebar 0x39
+    #define BlocNum 0x45
 
     extern const char* loadedKeys;
     extern const char ASCIITable[];

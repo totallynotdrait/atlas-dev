@@ -1,5 +1,7 @@
 #include "IDT.h"
 
+static isr_t interrupt_handlers[256];
+
 void IDTDescEntry::SetOffset(uint64_t offset){
     offset0 = (uint16_t)(offset & 0x000000000000ffff);
     offset1 = (uint16_t)((offset & 0x00000000ffff0000) >> 16);
@@ -12,4 +14,9 @@ uint64_t IDTDescEntry::GetOffset() {
     offset |= (uint64_t)offset1 << 16;
     offset |= (uint64_t)offset2 << 32;
     return offset;
+}
+
+void RegisterInterruptHandler(uint8_t index, isr_t handler) 
+{
+    interrupt_handlers[index] = handler;
 }

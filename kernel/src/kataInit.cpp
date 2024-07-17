@@ -1,10 +1,12 @@
 #include "kataInit.h"
+#include <acpi/rsdp.h>
 
 KAtaRenderer r = KAtaRenderer(NULL, NULL);
 KAtaRenderer ar = KAtaRenderer(NULL, NULL);
 KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 	memset(BootInfo->framebuffer->BaseAddress, 0, BootInfo->framebuffer->BufferSize);
-	
+	ACPI::RSDP* rsdp = (ACPI::RSDP*)BootInfo->rsdp;
+
 	r = KAtaRenderer(BootInfo->framebuffer, BootInfo->psf1_Font);
 	ar = KAtaRenderer(BootInfo->framebuffer, BootInfo->psf1_Font);
 	GKRenderer = &r;
@@ -63,6 +65,13 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 	outb(PIC2_DATA, 0b11101111);
 
 	asm ("sti");
+	InitialiseSyscalls();
+
+	if(!rsdp->is_valid())
+    {
+        Panic("RSDP_NOT_VALID");
+        while(true) asm("hlt");
+    }
 
 	bs.playBootSound("beep");
 	

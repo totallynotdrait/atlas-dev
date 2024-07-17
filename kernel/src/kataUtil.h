@@ -26,6 +26,9 @@
 #include <mem/heap.h>
 #include <aagui/aagui.h>
 #include <sound/pc_speaker.h>
+#include <syscall/syscall.h>
+#include <acpi/fadt.h>
+#include <acpi/madt/madt.h>
 
 struct BootInfo {
 	FrameBuffer* framebuffer;

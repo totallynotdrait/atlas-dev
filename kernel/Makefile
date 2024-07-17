@@ -8,7 +8,7 @@ CC = /usr/local/x86_64elfgcc/bin/x86_64-elf-gcc
 ASMC = nasm
 LD = /usr/local/x86_64elfgcc/bin/x86_64-elf-ld
 
-CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -Isrc -Isrc/log -Isrc/inc -Isrc/kata_renderer -fno-exceptions -Isrc/inc/libc -fno-rtti
+CFLAGS = -ffreestanding -fshort-wchar -g -mno-red-zone -Isrc -Isrc/log -Isrc/inc -Isrc/kata_renderer -fno-exceptions -Isrc/inc/libc -fno-rtti -O3
 ASMFLAGS = 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
@@ -30,12 +30,12 @@ kata: $(OBJS) link
 $(OBJDIR)/kata_renderer/kata_renderer.o: $(SRCDIR)/kata_renderer/kata_renderer.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"
 	@mkdir -p $(@D)
-	$(CC) -mno-red-zone -mgeneral-regs-only -masm=intel -ffreestanding -Isrc/log -Isrc/inc -Isrc/kata_renderer -Isrc/inc/libc -Isrc -c $^ -o $@
+	$(CC) -mno-red-zone -mgeneral-regs-only -masm=intel -ffreestanding -Isrc/log -Isrc/inc -Isrc/kata_renderer -O3 -g -Isrc/inc/libc -Isrc -c $^ -o $@ 
 
 $(OBJDIR)/inc/interrupts/interrupts.o: $(SRCDIR)/inc/interrupts/interrupts.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"
 	@mkdir -p $(@D)
-	$(CC) -mno-red-zone -mgeneral-regs-only -masm=intel -ffreestanding -Isrc/log -Isrc/inc -Isrc/kata_renderer -Isrc -Isrc/inc/libc -c $^ -o $@
+	$(CC) -mno-red-zone -mgeneral-regs-only -masm=intel -ffreestanding -Isrc/log -Isrc/inc -Isrc/kata_renderer -O3 -g -Isrc -Isrc/inc/libc -c $^ -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@echo "\e[91m[Compiling $^]\e[0m"

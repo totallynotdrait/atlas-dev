@@ -4,11 +4,11 @@
 class Log {
     public:
     Log();
-    void print(const char *str);
-    void info(const char *str);
-    void ok(const char *str);
-    void warn(const char *str);
-    void failed(const char *str);
+    void print(const char* format, ...);
+    void info(const char* format, ...);
+    void ok(const char* format, ...);
+    void warn(const char* format, ...);
+    void failed(const char* format, ...);
 };
 
 extern Log* log;

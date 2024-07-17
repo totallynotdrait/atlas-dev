@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include "PageFrameAllocator.h"
 #include <mem/memory.h>
+#include <liba/stdio.h>
+#include "page_tables.h"
 
 PageTableManager GPageTableManager = NULL;
 
@@ -16,6 +18,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory) {
     PDE = PML4->entries[indexer.PDP_i];
     PageTable* PDP;
     if (!PDE.GetFlag(PT_Flag::Present)) {
+        
         PDP = (PageTable*)GlobalAllocator.RequestPage();
         memset(PDP, 0, 0x1000);
         PDE.SetAddress((uint64_t)PDP >> 12);

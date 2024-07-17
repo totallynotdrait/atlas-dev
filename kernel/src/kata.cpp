@@ -41,8 +41,4 @@ extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
     GKRenderer->Next(); */
 
     init_ata_shell();
-
-    while (true) {
-        asm ("hlt");
-    }
 }

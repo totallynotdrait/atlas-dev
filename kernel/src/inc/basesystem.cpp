@@ -123,7 +123,8 @@ void basesystem::playBootSound(const char* boot) {
         disable_pc_speaker();
     } else if (strcmp(boot, "beep") == 0) {
         enable_pc_speaker();
-        play_note(NoteFrequency::A4, 1050);
+        play_note(NoteFrequency::A4, 2050);
+        PIT::Sleepd(1050);
         disable_pc_speaker();
     } else {
         log->failed("No boot sound, unknown boot sound.");
