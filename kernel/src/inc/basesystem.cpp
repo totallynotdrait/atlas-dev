@@ -69,9 +69,7 @@ void basesystem::shutdown() {
 }
 
 void basesystem::execute_elf(const char* elf_path) {
-    GKRenderer->printf("running ");
-    GKRenderer->printf(elf_path);
-    GKRenderer->Next();
+    printf("Running %d :: wowo accessing USA goverment servers... omg.\n");
 }
 
 void basesystem::enableMCE() {
@@ -129,4 +127,16 @@ void basesystem::playBootSound(const char* boot) {
     } else {
         log->failed("No boot sound, unknown boot sound.");
     }
+}
+
+void basesystem::enableNMI() {
+    outb(0x70, inb(0x70) & 0x7F);
+    inb(0x71);
+    log->ok("Enabled Non-Maskable Interrupt.");
+}
+
+void basesystem::disableNMI() {
+    outb(0x70, inb(0x70) | 0x80);
+    inb(0x71);
+    log->ok("Disabled Non-Maskable Interrupt.");
 }

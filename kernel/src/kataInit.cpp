@@ -67,9 +67,11 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 	asm ("sti");
 	InitialiseSyscalls();
 
+	bs.enableNMI();
+
 	if(!rsdp->is_valid())
     {
-        Panic("RSDP_NOT_VALID");
+        Panic("RSDP_NOT_VALID", nullptr);
         while(true) asm("hlt");
     }
 

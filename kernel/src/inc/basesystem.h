@@ -19,6 +19,8 @@ class basesystem
         void enableFPU();
         void set_fpu_cw(const uint16_t cw);
         void playBootSound(const char* boot);
+        void enableNMI();
+        void disableNMI();
 };
 
 

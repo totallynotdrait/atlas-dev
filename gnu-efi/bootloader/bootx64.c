@@ -6,6 +6,14 @@
 
 typedef unsigned long long size_t;
 
+typedef struct {
+	void* BaseAddress;
+	size_t BufferSize;
+	unsigned int Width;
+	unsigned int Height;
+	unsigned int PixelsPerScanline;
+} FrameBuffer;
+
 #define PSF1_MAGIC0 0x36
 #define PSF1_MAGIC1 0x04
 
@@ -18,16 +26,8 @@ typedef struct {
 typedef struct {
 	PSF1_HEADER* psf1_Header;
 	void* glyphBuffer;
+	void* unicodeTable;
 } PSF1_FONT;
-
-typedef struct {
-	void* BaseAddress;
-	size_t BufferSize;
-	unsigned int Width;
-	unsigned int Height;
-	unsigned int PixelsPerScanline;
-} FrameBuffer;
-
 
 
 FrameBuffer framebuffer; 
@@ -75,38 +75,48 @@ EFI_FILE* LoadFile(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EF
 	return LoadedFile;
 }
 
-PSF1_FONT* LoadPSF1Font(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
-{
-	EFI_FILE* font = LoadFile(Directory, Path, ImageHandle, SystemTable);
-	if (font == NULL) return NULL;
+PSF1_FONT* LoadPSF1Font(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
+    EFI_FILE* font = LoadFile(Directory, Path, ImageHandle, SystemTable);
+    if (font == NULL) return NULL;
 
-	PSF1_HEADER* fontHeader;
-	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_HEADER), (void**)&fontHeader);
-	UINTN size = sizeof(PSF1_HEADER);
-	font->Read(font, &size, fontHeader);
+    PSF1_HEADER* fontHeader;
+    SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_HEADER), (void**)&fontHeader);
+    UINTN size = sizeof(PSF1_HEADER);
+    font->Read(font, &size, fontHeader);
 
-	if (fontHeader->magic[0] != PSF1_MAGIC0 || fontHeader->magic[1] != PSF1_MAGIC1) {
-		return NULL;
-	}
+    if (fontHeader->magic[0] != PSF1_MAGIC0 || fontHeader->magic[1] != PSF1_MAGIC1) {
+        Print(L"Warning: Unable to load PSF1 Font because MAGIC0 or MAGIC1 are invalid!");
+        return NULL;
+    }
 
-	UINTN glyphBufferSize = fontHeader->charsize * 256;
-	if (fontHeader->mode == 1) { //512 mode
-		glyphBufferSize = fontHeader->charsize * 512;
-	}
+    UINTN glyphBufferSize = fontHeader->charsize * 256;
+    if (fontHeader->mode == 1) { // 512 mode
+        glyphBufferSize = fontHeader->charsize * 512;
+    }
 
-	void* glyphBuffer;
-	{
-		font->SetPosition(font, sizeof(PSF1_HEADER));
-		SystemTable->BootServices->AllocatePool(EfiLoaderData, glyphBufferSize, (void**)&glyphBuffer);
-		font->Read(font, &glyphBufferSize, glyphBuffer);
-	}
+    void* glyphBuffer;
+    {
+        font->SetPosition(font, sizeof(PSF1_HEADER));
+        SystemTable->BootServices->AllocatePool(EfiLoaderData, glyphBufferSize, (void**)&glyphBuffer);
+        font->Read(font, &glyphBufferSize, glyphBuffer);
+    }
 
-	PSF1_FONT* finishedFont;
-	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_FONT), (void**)&finishedFont);
-	finishedFont->psf1_Header = fontHeader;
-	finishedFont->glyphBuffer = glyphBuffer;
-	return finishedFont;
+    // Allocate memory for the Unicode translation table if it exists
+    void* unicodeTable = NULL;
+    if (fontHeader->mode == 1) {
+        UINTN unicodeTableSize = glyphBufferSize / fontHeader->charsize * sizeof(UINT16);
+        SystemTable->BootServices->AllocatePool(EfiLoaderData, unicodeTableSize, (void**)&unicodeTable);
+        font->Read(font, &unicodeTableSize, unicodeTable);
+    }
+
+    PSF1_FONT* finishedFont;
+    SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_FONT), (void**)&finishedFont);
+    finishedFont->psf1_Header = fontHeader;
+    finishedFont->glyphBuffer = glyphBuffer;
+    finishedFont->unicodeTable = unicodeTable;
+    return finishedFont;
 }
+
 
 int memcmp (const void* aptr, const void* bptr, size_t n) {
 	const unsigned char* a = aptr, *b = bptr;

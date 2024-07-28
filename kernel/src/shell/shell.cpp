@@ -84,7 +84,10 @@ void command_mode(char* input) {
         printf("putchar <hex>\t\t: Prints a character\n");
         printf("--- debug commands ---\n");
         printf("kata.init.0\t\t: Does a division by 0, causing Atlas to crash\n");
-        printf("kata.init.1\t\t: Does a page fault, causing Atlas to crash");
+        printf("kata.init.1\t\t: Does a page fault, causing Atlas to crash\n");
+        printf("kata.init.3\t\t: Causes a Non-Maskable Interrupt\n");
+
+        printf("kata.test.psf\t\t: Prints all of the characters of the current PSF font (0x00 to 0xFF)");
     } else if (check_short_command(input, "echo", 4)) {
         char* msg = &input[5];
         printf(msg);
@@ -92,9 +95,14 @@ void command_mode(char* input) {
         const char* chr_str = &input[8];
         uint8_t chr = hexStringToUInt8(chr_str);
         GKRenderer->putChar((char)chr);
-        
+    } else if (check_short_command(input, "setcc", 5)) {
+        const char* hex_str = &input[6];
+        uint64_t hex = hexStringToUInt8(hex_str);
+        GKRenderer->ClearColor = hex;
     } else if (check_command(input, "clear")) {
         printf("\\c");
+    } else if (check_command(input, "whoami")) {
+        printf("idk, lol");
     } else if (check_command(input, "kata.init.0")) {
         int a = 1;
         int b = 0;
@@ -102,6 +110,13 @@ void command_mode(char* input) {
     } else if (check_command(input, "kata.init.1")) {
         int* t = (int*)0x80000000000;
         *t = 2;
+    } else if (check_command(input, "kata.init.3")) {
+        asm volatile ("outb %al, $0x92");
+    } else if (check_command(input, "kata.test.psf")) {
+        for(int i = 0x00; i <= 0xFF; ++i) {
+            GKRenderer->putChar((char)i);
+            GKRenderer->putChar(' ');
+        }
     } else if (check_command(input, "forse")) {
         printf("non far");
         GKRenderer->putChar((char)0xF2);
@@ -142,32 +157,35 @@ void init_ata_shell() {
     printf("oo_____oo__oo__o__oo___oo___oo_o___oo_\t\tReserved memory: %d MB\n", reservedRam/1048576); GKRenderer->Color = 0x009edc;
     printf("oo_____oo___ooo__ooooo__oooo_o__oooo__\t\t\n"); 
     printf("______________________________________\t\t");
+    
     GKRenderer->Color = hbc.White;
-    printf("█");
+    
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Gray;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Red;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Maroon;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Yellow;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Lime;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Green;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Cyan;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Teal;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Blue;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Navy;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Magenta;
-    printf("█");
+    GKRenderer->putChar((char)0x05);
     GKRenderer->Color = hbc.Purple;
-    printf("█\n");
+    GKRenderer->putChar((char)0x05);
+    printf("\n");
     GKRenderer->Color = 0x009edc;
     
     GKRenderer->Color = hbc.Gray;
@@ -183,7 +201,6 @@ void init_ata_shell() {
     printf("\t\tYour computer probably doesn't have a PC Speaker.\n");
     printf("\tHave a certain amount of RAM like 16 GB but it shows 15 GB?\n");
     printf("\t\tIt's normal, probably a few 100 or 200 MB of memory are reserved.\n\n");
-
     while (true) {
         char cmdbuffer[256] = "";
         GKRenderer->Color = 0x009edc; printf("atlas@shell "); GKRenderer->Color = 0xea4c89; printf("~ "); GKRenderer->Color = hbc.Gray; printf("> "); GKRenderer->Color = hbc.Gray;

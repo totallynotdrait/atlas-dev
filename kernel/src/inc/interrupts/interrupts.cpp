@@ -47,90 +47,90 @@ __attribute__((interrupt)) void syscall_Handler(interrupt_frame* frame) {
 
 // fault handlers
 __attribute__((interrupt)) void PageFault_Handler(interrupt_frame* frame) {
-    Panic("PAGE_FAULT");
+    Panic("PAGE_FAULT", frame);
     while (true);
 }
 __attribute__((interrupt)) void DoubleFault_Handler(interrupt_frame* frame) {
-    Panic("DOUBLE_FAULT");
+    Panic("DOUBLE_FAULT", frame);
     while (true);
 }
 __attribute__((interrupt)) void GPFault_Handler(interrupt_frame* frame) {
-    Panic("GENERAL_PROTECTION_FAULT");
+    Panic("GENERAL_PROTECTION_FAULT", frame);
     while (true);
 }
 __attribute__((interrupt)) void DEE_Handler(interrupt_frame* frame) {
     log->failed("[INTERNAL_SYSTEM] [DIVISION_ERROR] Please stop trying to crash atlas or create a black hole inside the computer."); // sincerely...
 }
 __attribute__((interrupt)) void D_Handler(interrupt_frame* frame) {
-    Panic("hello debug");
+    Panic("hello debug", frame);
     while (true);
 }
 __attribute__((interrupt)) void BPE_Handler(interrupt_frame* frame) {
-    Panic("BREAKPOINT (hello debug)");
+    Panic("BREAKPOINT (hello debug)", frame);
     while (true);
 }
 __attribute__((interrupt)) void OFE_Handler(interrupt_frame* frame) {
-    Panic("OVERFLOW");
+    Panic("OVERFLOW", frame);
     while (true);
 }
 __attribute__((interrupt)) void BREE_Handler(interrupt_frame* frame) {
-    Panic("BOUND_RANGE_EXCEEDED");
+    Panic("BOUND_RANGE_EXCEEDED", frame);
     while (true);
 }
 __attribute__((interrupt)) void IOCE_Handler(interrupt_frame* frame) {
-    Panic("INVALID_OPCODE");
+    Panic("INVALID_OPCODE", frame);
     while (true);
 }
 __attribute__((interrupt)) void DNAE_Handler(interrupt_frame* frame) {
-    Panic("DEVICE_NOT_AVAILABLE");
+    Panic("DEVICE_NOT_AVAILABLE", frame);
     while (true);
 }
 __attribute__((interrupt)) void ITSSE_Handler(interrupt_frame* frame) {
-    Panic("INVALID_TSS");
+    Panic("INVALID_TSS", frame);
     while (true);
 }
 __attribute__((interrupt)) void SNPE_Handler(interrupt_frame* frame) {
-    Panic("SEGMENT_NOT_PRESENT");
+    Panic("SEGMENT_NOT_PRESENT", frame);
     while (true);
 }
 __attribute__((interrupt)) void SSFE_Handler(interrupt_frame* frame) {
-    Panic("STACK-SEGMENT_FAULT");
+    Panic("STACK-SEGMENT_FAULT", frame);
     while (true);
 }
 __attribute__((interrupt)) void FPE_Handler(interrupt_frame* frame) {
-    Panic("x87_FLOATING-POINT_EXCEPTION");
+    Panic("x87_FLOATING-POINT_EXCEPTION", frame);
     while (true);
 }
 __attribute__((interrupt)) void ACE_Handler(interrupt_frame* frame) {
-    Panic("ALIGNMENT_CHECK");
+    Panic("ALIGNMENT_CHECK", frame);
     while (true);
 }
 __attribute__((interrupt)) void MCE_Handler(interrupt_frame* frame) {
-    Panic("MACHINE_CHECK");
+    Panic("MACHINE_CHECK", frame);
     while (true);
 }
 __attribute__((interrupt)) void SIMDFPE_Handler(interrupt_frame* frame) {
-    Panic("SIMD_FLOATING-POINT_EXCEPTION");
+    Panic("SIMD_FLOATING-POINT_EXCEPTION", frame);
     while (true);
 }
 __attribute__((interrupt)) void VEE_Handler(interrupt_frame* frame) {
-    Panic("VIRTUALIZATION_EXCEPTION");
+    Panic("VIRTUALIZATION_EXCEPTION", frame);
     while (true);
 }
 __attribute__((interrupt)) void CPE_Handler(interrupt_frame* frame) {
-    Panic("CONTROL_PROTECTION_EXCEPTION");
+    Panic("CONTROL_PROTECTION_EXCEPTION", frame);
     while (true);
 }
 __attribute__((interrupt)) void HIE_Handler(interrupt_frame* frame) {
-    Panic("HYPERVISOR_INJECTION_EXCEPTION");
+    Panic("HYPERVISOR_INJECTION_EXCEPTION", frame);
     while (true);
 }
 __attribute__((interrupt)) void VMMCE_Handler(interrupt_frame* frame) {
-    Panic("VMM_COMMUNICATION_EXCEPTION");
+    Panic("VMM_COMMUNICATION_EXCEPTION", frame);
     while (true);
 }
 __attribute__((interrupt)) void SE_Handler(interrupt_frame* frame) {
-    Panic("SECURITY_EXCEPTION");
+    Panic("SECURITY_EXCEPTION", frame);
     while (true);
 }
 

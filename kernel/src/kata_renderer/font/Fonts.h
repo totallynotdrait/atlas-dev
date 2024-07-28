@@ -9,4 +9,5 @@ struct PSF1_HEADER{
 struct PSF1_FONT{
 	PSF1_HEADER* psf1_Header;
     void* glyphBuffer;
+    void* unicodeTable;
 };

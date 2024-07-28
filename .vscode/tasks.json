@@ -1,36 +1,24 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
-            "type": "cppbuild",
-            "label": "Build kernel",
-            "command": "/usr/bin/make",
-            "args": [
-                "kernel",
-                "buildimg"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/kernel"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "label": "Build Atlas",
+            "type": "shell",
+            "command": "cd kernel && ./build.sh"
         },
         {
-            "type": "process",
-            "label": "Launch Qemu",
-            "command": "explorer.exe",
-            "args": [
-                "run.bat"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/kernel"
-            },
-            "dependsOn": "Build kernel"
+            "label": "Run Atlas",
+            "type": "shell",
+            "command": "powershell.exe \"Start-Process .\\kernel\\run.bat\"" 
+        },
+        {
+            "label": "Build and Run Atlas",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Build Atlas",
+                "Run Atlas"
+            ]
         }
-    ],
-    "version": "2.0.0"
+    ]
 }

@@ -37,25 +37,6 @@ char getch() {
     }
 
     switch (scancode) {
-        // keypad
-        if (isNumpadEnabled == true) {
-            case 0x52: return '0';
-            case 0x4F: return '1';
-            case 0x50: return '2';
-            case 0x51: return '3';
-            case 0x4B: return '4';
-            case 0x4C: return '5';
-            case 0x4D: return '6';
-            case 0x47: return '7';
-            case 0x48: return '8';
-            case 0x49: return '9';
-            case 0x37: return '*';
-            case 0x4A: return '-';
-            case 0x4E: return '+';
-            case 0x53: return '.';
-            case 0x35: return '/';       
-        }
-        
 
         // arrow keys (ignores)
         case 0xE048: return getch();
@@ -72,6 +53,27 @@ char getch() {
         case 0x0F: return getch();
         case 0x3A: return getch();
 
+    }
+
+    switch (scancode) {
+        // keypad
+        if (isNumpadEnabled) {
+            case 0x52: return '0';
+            case 0x4F: return '1';
+            case 0x50: return '2';
+            case 0x51: return '3';
+            case 0x4B: return '4';
+            case 0x4C: return '5';
+            case 0x4D: return '6';
+            case 0x47: return '7';
+            case 0x48: return '8';
+            case 0x49: return '9';
+            case 0x37: return '*';
+            case 0x4A: return '-';
+            case 0x4E: return '+';
+            case 0x53: return '.';
+            case 0x35: return '/';       
+        }
     }
 
     // Translate other scancodes to ASCII

@@ -120,38 +120,40 @@ void KAtaRenderer::scanf(const char* str) {
 }
 
 void KAtaRenderer::putChar(char chr, unsigned int xOff, unsigned int yOff) {
-    
     if (CursorPosition.X + 8 > TargetFramebuffer->Width) {
         CursorPosition.X = 0;
         CursorPosition.Y += 16;
     }
 
-    if (CursorPosition.Y + 16 > TargetFramebuffer->Height){
+    if (CursorPosition.Y + 16 > TargetFramebuffer->Height) {
         scroll_up(*TargetFramebuffer);
         CursorPosition.Y -= 16;
     }
-    
-    unsigned int *pixPtr = (unsigned int *)TargetFramebuffer->BaseAddress;
-    char *fontPtr = ((char *)PSF1_Font->glyphBuffer) + (chr * PSF1_Font->psf1_Header->charsize);
 
-    for (int64_t y = yOff; y < yOff + 16; y++)
-    {
-        for (int64_t x = xOff; x < xOff + 8; x++)
-        {
-            if (x >= 0 && x < TargetFramebuffer->Width && y >= 0 && y < TargetFramebuffer->Height)
-                if ((*fontPtr & (0b10000000 >> (x - xOff))) > 0)
-                {
-                    *(unsigned int *)(pixPtr + x + (y * TargetFramebuffer->PixelsPerScanline)) = Color;
-                }
-        }
-        fontPtr++;
+    unsigned int *pixPtr = (unsigned int *)TargetFramebuffer->BaseAddress;
+    char *fontPtr;
+
+    // Check if character is within the standard ASCII range (0-127)
+    if (chr < 128) {
+        fontPtr = ((char *)PSF1_Font->glyphBuffer) + (chr * PSF1_Font->psf1_Header->charsize);
+    } else {
+        fontPtr = ((char *)PSF1_Font->glyphBuffer) + (chr * PSF1_Font->psf1_Header->charsize);
     }
 
-    
+    for (int64_t y = yOff; y < yOff + 16; y++) {
+        char fontByte = *fontPtr++;
+        for (int64_t x = xOff; x < xOff + 8; x++) {
+            if (x >= 0 && x < TargetFramebuffer->Width && y >= 0 && y < TargetFramebuffer->Height) {
+                if ((fontByte & (0b10000000 >> (x - xOff))) != 0) {
+                    pixPtr[x + y * TargetFramebuffer->PixelsPerScanline] = Color;
+                }
+            }
+        }
+    }
 }
 
+
 void KAtaRenderer::putChar(char chr) {
-    
     putChar(chr, CursorPosition.X, CursorPosition.Y);
     CursorPosition.X += 8;
     
