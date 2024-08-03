@@ -59,6 +59,28 @@ void* memcpy(void* dest, const void* src, size_t n)
     return dest;
 }
 
+void* memmove(void* dest, const void* src, size_t n) {
+    // Cast pointers to uint8_t* for byte-wise manipulation
+    uint8_t* d = static_cast<uint8_t*>(dest);
+    const uint8_t* s = static_cast<const uint8_t*>(src);
+
+    // If the source and destination overlap, copy from the end to avoid overwriting
+    if (d > s && d < s + n) {
+        d += n;
+        s += n;
+        while (n--) {
+            *(--d) = *(--s);
+        }
+    } else {
+        // No overlap, or destination is before source, copy normally
+        while (n--) {
+            *d++ = *s++;
+        }
+    }
+
+    return dest;
+}
+
 uint64_t GetMemorySize(EFI_MEMORY_DESCRIPTOR* mMap, uint64_t mMapEntries, uint64_t mMapDescSize) {
     static uint64_t memorySizeBytes = 0;
     if (memorySizeBytes > 0) return memorySizeBytes;

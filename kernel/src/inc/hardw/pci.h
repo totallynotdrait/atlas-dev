@@ -48,7 +48,6 @@
 #define PCI_CONFIG_MAX_LATENCY          0x3f
 
 // PCI BAR
-
 #define PCI_BAR_IO                      0x01
 #define PCI_BAR_LOWMEM                  0x02
 #define PCI_BAR_64                      0x04
@@ -91,6 +90,20 @@ namespace PCI {
         uint8_t MinGrant;
         uint8_t MaxLatency;
     };
+
+    typedef union pci_dev {
+        uint32_t bits;
+        struct {
+            uint32_t always_zero    : 2;
+            uint32_t field_num      : 6;
+            uint32_t function_num   : 3;
+            uint32_t device_num     : 5;
+            uint32_t bus_num        : 8;
+            uint32_t reserved       : 7;
+            uint32_t enable         : 1;
+        };
+    } pci_dev_t;
+    
 
     struct BaseAddressRegister
     {

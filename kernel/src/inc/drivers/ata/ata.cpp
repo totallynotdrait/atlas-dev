@@ -1,6 +1,7 @@
 #include "ata.h"
 
 #include <IO/IO.h>
+#include <log.h>
 
 /*
     BSY: a 1 means that the controller is busy executing a command. No register should be accessed (except the digital output register) while this bit is set.
@@ -19,8 +20,6 @@
 #define STATUS_DF 0x20
 #define STATUS_ERR 0x01
 
-//This is really specific to out OS now, assuming ATA bus 0 master 
-//Source - OsDev wiki
 static void WaitBSY();
 static void WaitDRQ();
 
@@ -75,6 +74,7 @@ void WriteSectorsATA(uint32_t LBA, uint8_t sector_count, uint32_t* bytes)
 static void WaitBSY()   //Wait for bsy to be 0
 {
 	while(inb(0x1F7) & STATUS_BSY);
+	
 }
 static void WaitDRQ()  //Wait fot drq to be 1
 {

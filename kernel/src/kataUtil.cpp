@@ -50,8 +50,8 @@ IDTR idtr;
 uint8_t countInt = 0;
 void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t selector) {
 	countInt += 1;
-	/* GKRenderer->printf("           "); GKRenderer->printf(to_hexstring(countInt)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring((uint64_t)handler)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(entryOffset)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(type_attr)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(selector));
-	GKRenderer->Next(); */
+	GKRenderer->printf("           "); GKRenderer->printf(to_hexstring(countInt)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring((uint64_t)handler)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(entryOffset)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(type_attr)); GKRenderer->printf(" / "); GKRenderer->printf(to_hexstring(selector));
+	GKRenderer->Next();
 	IDTDescEntry* interrupt = (IDTDescEntry*)(idtr.Offset + entryOffset * sizeof(IDTDescEntry));
 	interrupt->SetOffset((uint64_t)handler);
 	interrupt->type_attr = type_attr;

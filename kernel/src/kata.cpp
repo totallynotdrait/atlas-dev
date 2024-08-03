@@ -18,27 +18,67 @@
 
 #include "kataInit.h"
 #include "shell/shell.h"
+#include <fs/ext2.h>
+#include <fs/vfs.h>
+#include <drivers/ata/ata.h>
+#include <drivers/ata/ata_device.h>
+#include <liba/string.h>
+
+// use just for testing
+void create_directory_example() {
+    log->print("Initializing Ext2 FileSystem...");
+    
+    ATADevice* ataDevice = new ATADevice();
+    log->info(to_hexstring((uint64_t)ataDevice));
+    Ext2* ext2 = new Ext2(ataDevice);
+    ext2->Init();
+
+
+    vfs_node_t root;
+    memset(&root, 0, sizeof(vfs_node_t));
+    root.name[0] = '/';
+    root.name[1] = '\0';
+    root.inode_num = 2;
+    root.size = 0;
+    root.device = ataDevice;
+    root.fs_type = VFS_EXT2_MAGIC;
+    root.flags = FS_DIRECTORY;
+    root.open_flags = 0;
+    root.create_time = root.access_time = root.modified_time = 0;
+    root.offset = 0;
+    root.nlink = 2;
+    root.refcount = 0;
+
+    root.read = nullptr;
+    root.write = nullptr;
+    root.open = nullptr;
+    root.close = nullptr;
+    root.readdir = nullptr;
+    root.finddir = nullptr;
+    root.create = nullptr;
+    root.unlink = nullptr;
+    root.mkdir = nullptr;
+    root.ioctl = nullptr;
+    root.get_size = nullptr;
+    root.chmod = nullptr;
+    root.get_file_size = nullptr;
+    root.listdir = nullptr;
+    
+    log->ok("Ext2 FileSystem is initialized successfully.");
+}
 
 extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
     KAtaInfo kataInfo = InitializeKAta(bootInfo);
 
     // main
     log->ok("Atlas initialized succefully.");
-    
-    /* GKRenderer->Clear();
-    GKRenderer->printf("[Welcome to "); GKRenderer->Color = bc.Cyan; GKRenderer->printf("Atlas-xUn"); GKRenderer->Color = bc.White; GKRenderer->printf("]");
-    GKRenderer->Next();
-    GKRenderer->printf("Atlas succefully booted to KAta with no errors, maybe.");
-    GKRenderer->Next();
-    GKRenderer->Next();
-    GKRenderer->printf("If mouse and keyboard are not working, it would probably because you're using a USB keyboard and mouse that Atlas doesn't currently support.");
-    GKRenderer->Next();
-    GKRenderer->printf("If for some reason boot-loops (which is impossible to read this text) it mostly cause because not enough sectors are read into memory.");
-    GKRenderer->Next();
-    GKRenderer->Next();
-    GKRenderer->printf("You are using atlas-dev, which is a preview of atlas before a official release, but it may be unstable and cause crashes.");
-    GKRenderer->Next();
-    GKRenderer->Next(); */
 
-    init_ata_shell();
+    char* res;
+    scanf(":: start ata shell?\n[y]es, [n]o /? %s", res);
+    if (strcmp(res, "y") == 0) {
+        init_ata_shell();
+    } else {
+        while (true);
+    }
+    
 }

@@ -2,6 +2,7 @@
 #include <drivers/AHCI/AHCI.h>
 #include <mem/heap.h>
 #include <IO/IO.h>
+#include <liba/stdio.h>
 
 namespace PCI {
     void EnumerateFunction(uint64_t deviceAddress, uint64_t function) {
@@ -14,17 +15,7 @@ namespace PCI {
         if (pciDeviceHeader->DeviceID == 0) return;
         if (pciDeviceHeader->DeviceID == 0xFFFF) return;  
 
-        /* GKRenderer->printf(GetVendorName(pciDeviceHeader->VendorID));
-        GKRenderer->printf(" / ");
-        GKRenderer->printf(GetDeviceName(pciDeviceHeader->VendorID, pciDeviceHeader->DeviceID));
-        GKRenderer->printf(" / ");
-        GKRenderer->printf(DeviceClasses[pciDeviceHeader->Class]);
-        GKRenderer->printf(" / ");
-        GKRenderer->printf(GetSubclassName(pciDeviceHeader->Class, pciDeviceHeader->Subclass));
-        GKRenderer->printf(" / ");
-        GKRenderer->printf(GetProgIFName(pciDeviceHeader->ProgIF, pciDeviceHeader->Class, pciDeviceHeader->Subclass));
-        GKRenderer->Next(); */
-
+        printf("%s / %s / %s / %s / %s \n", GetVendorName(pciDeviceHeader->VendorID), GetDeviceName(pciDeviceHeader->VendorID, pciDeviceHeader->DeviceID), DeviceClasses[pciDeviceHeader->Class], GetSubclassName(pciDeviceHeader->Class, pciDeviceHeader->Subclass), GetProgIFName(pciDeviceHeader->ProgIF, pciDeviceHeader->Class, pciDeviceHeader->Subclass));
         switch (pciDeviceHeader->Class) {
             case 0x01:
                 switch (pciDeviceHeader->Subclass) {
@@ -39,15 +30,19 @@ namespace PCI {
                     case 0x03: // USB Controller
                         switch (pciDeviceHeader->ProgIF) {
                             case 0x00: // UHCI
+                                log->warn("UHCI USB Controller was found and implemented, but not initialized.");
                                 break;
 
                             case 0x10: //OHCI
+                                log->warn("OHCI USB Controller was found and implemented, but not initialized.");
                                 break;
 
                             case 0x20: //EHCI
+                                log->warn("EHCI USB Controller was found and implemented, but not initialized.");
                                 break;
 
                             case 0x30: //XHCI
+                                log->warn("XHCI USB Controller was found and implemented, but not initialized.");
                                 break;
                         }
                 }

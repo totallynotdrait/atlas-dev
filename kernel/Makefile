@@ -26,25 +26,32 @@ OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
 OBJS += $(patsubst $(SRCDIR)/%.asm, $(OBJDIR)/%_asm.o, $(ASMSRC))
 DIRS = $(wildcard $(SRCDIR)/*)
 
+TOTAL_FILES := $(shell echo $(SRC) $(ASMSRC) | wc -w)
+COMPILED_FILES := 0
+
 kata: $(OBJS) link
 
 $(OBJDIR)/kata_renderer/kata_renderer.o: $(SRCDIR)/kata_renderer/kata_renderer.cpp
-	@echo "\e[91m[Compiling $^]\e[0m"
+	$(eval COMPILED_FILES := $(shell echo $$(($(COMPILED_FILES)+1))))
+	@echo "\e[91m[$(COMPILED_FILES)/$(TOTAL_FILES)] [Compiling $^]\e[0m"
 	@mkdir -p $(@D)
 	$(CC) -mno-red-zone -g -mgeneral-regs-only -masm=intel -O3 -ffreestanding -Isrc/log -Isrc/inc -Isrc/kata_renderer  -Isrc/inc/libc -Isrc -c $^ -o $@ 
 
 $(OBJDIR)/inc/interrupts/interrupts.o: $(SRCDIR)/inc/interrupts/interrupts.cpp
-	@echo "\e[91m[Compiling $^]\e[0m"
+	$(eval COMPILED_FILES := $(shell echo $$(($(COMPILED_FILES)+1))))
+	@echo "\e[91m[$(COMPILED_FILES)/$(TOTAL_FILES)] [Compiling $^]\e[0m"
 	@mkdir -p $(@D)
 	$(CC) -mno-red-zone -g -mgeneral-regs-only -masm=intel -O3 -ffreestanding -Isrc/log -Isrc/inc -Isrc/kata_renderer  -Isrc -Isrc/inc/libc -c $^ -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	@echo "\e[91m[Compiling $^]\e[0m"
+	$(eval COMPILED_FILES := $(shell echo $$(($(COMPILED_FILES)+1))))
+	@echo "\e[91m[$(COMPILED_FILES)/$(TOTAL_FILES)] [Compiling $^]\e[0m"
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 $(OBJDIR)/%_asm.o: $(SRCDIR)/%.asm
-	@echo "\e[91m[Compiling $^]\e[0m"
+	$(eval COMPILED_FILES := $(shell echo $$(($(COMPILED_FILES)+1))))
+	@echo "\e[91m[$(COMPILED_FILES)/$(TOTAL_FILES)] [Compiling $^]\e[0m"
 	@mkdir -p $(@D)
 	$(ASMC) $(ASMFLAGS) $^ -f elf64 -o $@
 

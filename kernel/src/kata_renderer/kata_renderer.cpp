@@ -88,28 +88,25 @@ void KAtaRenderer::drawCursor(bool on) {
 }
 
 void KAtaRenderer::scroll_up(FrameBuffer fb) {
+    if (fb.Width == 0 || fb.Height == 0 || fb.BaseAddress == nullptr) {
+        return; 
+    }
+
+    const uint32_t char_height = 16;
+    const uint32_t bytes_per_pixel = 4;
+    
     uint32_t width = fb.Width;
     uint32_t height = fb.Height;
-    uint32_t char_height = 16;  // Assuming character height of 16 pixels
 
-    // Adjust bytes_per_pixel to match the actual framebuffer color depth
-    uint32_t bytes_per_pixel = 4;  // Assuming 32-bit color (4 bytes per pixel)
-
-    uint32_t row_size = width * bytes_per_pixel;  // Size of one row in bytes
-
-    // Calculate the size to move the screen content up by one character height
+    uint32_t row_size = width * bytes_per_pixel;
     uint32_t scroll_height = height - char_height;
     uint64_t copy_size = row_size * scroll_height;
 
-    void* addr = fb.BaseAddress;
+    void* base_addr = fb.BaseAddress;
 
-    // Move everything up by char_height rows
-    memcpy(addr, (void*)((uint64_t)addr + row_size * char_height), copy_size);
-
-    // Clear the last char_height rows
-    uint64_t offset = row_size * scroll_height;
-    void* last_row = (void*)((uint64_t)addr + offset);
-    memset(last_row, 0, row_size * char_height);  // Clear with black color (0)
+    memmove(base_addr, (void*)((uint64_t)base_addr + row_size * char_height), copy_size);
+    void* clear_start_addr = (void*)((uint64_t)base_addr + copy_size);
+    memset(clear_start_addr, 0, row_size * char_height);
 }
 
 
@@ -130,7 +127,16 @@ void KAtaRenderer::putChar(char chr, unsigned int xOff, unsigned int yOff) {
         CursorPosition.Y -= 16;
     }
 
-    unsigned int *pixPtr = (unsigned int *)TargetFramebuffer->BaseAddress;
+    // Draw background color
+    unsigned int* pixPtr = (unsigned int*)TargetFramebuffer->BaseAddress;
+    for (unsigned long y = CursorPosition.Y; y < CursorPosition.Y + 16; y++) {
+        for (unsigned long x = CursorPosition.X; x < CursorPosition.X + 8; x++) {
+            pixPtr[x + y * TargetFramebuffer->PixelsPerScanline] = ClearColor;
+        }
+    }
+
+    // Draw character
+    unsigned int *charPixPtr = (unsigned int *)TargetFramebuffer->BaseAddress;
     char *fontPtr;
 
     // Check if character is within the standard ASCII range (0-127)
@@ -140,17 +146,19 @@ void KAtaRenderer::putChar(char chr, unsigned int xOff, unsigned int yOff) {
         fontPtr = ((char *)PSF1_Font->glyphBuffer) + (chr * PSF1_Font->psf1_Header->charsize);
     }
 
-    for (int64_t y = yOff; y < yOff + 16; y++) {
-        char fontByte = *fontPtr++;
-        for (int64_t x = xOff; x < xOff + 8; x++) {
-            if (x >= 0 && x < TargetFramebuffer->Width && y >= 0 && y < TargetFramebuffer->Height) {
-                if ((fontByte & (0b10000000 >> (x - xOff))) != 0) {
-                    pixPtr[x + y * TargetFramebuffer->PixelsPerScanline] = Color;
+    for (int64_t y = 0; y < 16; y++) {
+        char fontByte = fontPtr[y];
+        for (int64_t x = 0; x < 8; x++) {
+            if (CursorPosition.X + x < TargetFramebuffer->Width && CursorPosition.Y + y < TargetFramebuffer->Height) {
+                if ((fontByte & (0b10000000 >> x)) != 0) {
+                    charPixPtr[(CursorPosition.X + x) + (CursorPosition.Y + y) * TargetFramebuffer->PixelsPerScanline] = Color;
                 }
             }
         }
     }
 }
+
+
 
 
 void KAtaRenderer::putChar(char chr) {

@@ -83,7 +83,7 @@ char getch() {
 
 
 
-void HandleKeyboard(uint8_t scancode) {
+void HandleKeyboard(uint16_t scancode) {
 
     if (!isKeyboardEnabled) return;
 

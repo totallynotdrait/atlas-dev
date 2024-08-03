@@ -60,6 +60,7 @@ __attribute__((interrupt)) void GPFault_Handler(interrupt_frame* frame) {
 }
 __attribute__((interrupt)) void DEE_Handler(interrupt_frame* frame) {
     log->failed("[INTERNAL_SYSTEM] [DIVISION_ERROR] Please stop trying to crash atlas or create a black hole inside the computer."); // sincerely...
+    while (true);
 }
 __attribute__((interrupt)) void D_Handler(interrupt_frame* frame) {
     Panic("hello debug", frame);

@@ -18,3 +18,8 @@ size_t strlen(char* s)
 {
     return __strlen(s);
 }
+
+char* strcpy(char* dst, const char* src)
+{
+    return __strcpy(dst, src);
+}

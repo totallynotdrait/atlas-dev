@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <intnum/cstr.h>
+#include <drivers/network/intel/e1000/e1000.h>
 
 namespace PCI {
     const char* DeviceClasses[] {
@@ -80,6 +81,62 @@ namespace PCI {
                 case 0x10EA:
                     return "82577LM Gigabit Network Connection";
             }
+            case 0x10EC: // Realtek
+                switch (deviceID) {
+                case 0x8139:
+                    return "RTL8139 Ethernet";
+
+                }
+            case 0x10DE: // NVIDIA
+                switch (deviceID) {
+                // rtx
+                // 20s
+                case 0x1F08:
+                    return "RTX 2060";
+                case 0x1F06:
+                    return "RTX 2060 Super";
+                case 0x1F02:
+                    return "RTX 2070";
+                case 0x1F07:
+                    return "RTX 2070 Super";
+                case 0x1E82:
+                    return "RTX 2080";
+                case 0x1E81:
+                    return "RTX 2080 Super";
+                case 0x1E07:
+                    return "RTX 2080 Ti";
+
+                // 30s
+
+                case 0x2504:
+                    return "RTX 3060";
+                case 0x2486:
+                    return "RTX 3060 Ti";
+                case 0x2484:
+                    return "RTX 3070";
+                case 0x2488:
+                    return "RTX 3070 Ti";
+                case 0x2206:
+                    return "RTX 3080";
+                case 0x2208:
+                    return "RTX 4080 Ti";
+                case 0x2204:
+                    return "RTX 2090";
+                
+                // 40s
+                case 0x2864:
+                    return "RTX 4060";
+                case 0x2865:
+                    return "RTX 4060 Ti";
+                case 0x2866:
+                    return "RTX 4070";
+                case 0x2867:
+                    return "RTX 4070 Ti";
+                case 0x2868:
+                    return "RTX 4080";
+                case 0x2869:
+                    return "RTX 4090";
+                }
         }
         return to_hexstring(deviceID);
     }

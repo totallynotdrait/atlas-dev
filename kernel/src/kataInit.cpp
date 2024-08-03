@@ -1,5 +1,6 @@
 #include "kataInit.h"
 #include <acpi/rsdp.h>
+#include <drivers/serial/serial.h>
 
 KAtaRenderer r = KAtaRenderer(NULL, NULL);
 KAtaRenderer ar = KAtaRenderer(NULL, NULL);
@@ -51,6 +52,9 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 	GKRenderer->printf(" MB");
 	GKRenderer->Next();
 
+	PIT::SetDivisor(65536);
+
+	
 
 	InitializeHeap((void*)0x0000100000000000, 0x10);
 
@@ -74,6 +78,14 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
         Panic("RSDP_NOT_VALID", nullptr);
         while(true) asm("hlt");
     }
+
+	if ((GlobalAllocator.GetUsedRAM()/1048576) + (GlobalAllocator.GetFreeRAM()/1048576) <= 70) {
+		log->warn("Low on resources, unstable operation ahead.");
+		PIT::Sleepd(2);
+	}
+
+
+	serial_init();
 
 	bs.playBootSound("beep");
 	

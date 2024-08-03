@@ -10,7 +10,11 @@
     "compare": "cpp",
     "cstddef": "cpp",
     "random": "cpp",
-    "conio.h": "c"
+    "conio.h": "c",
+    "cstdlib": "cpp",
+    "iosfwd": "cpp",
+    "limits": "cpp",
+    "streambuf": "cpp"
   },
   "C_Cpp.errorSquiggles": "enabled",
   "debug.onTaskErrors": "debugAnyway",

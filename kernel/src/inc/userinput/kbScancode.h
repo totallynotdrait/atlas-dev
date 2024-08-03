@@ -13,5 +13,5 @@ namespace QWERTYKeyboard {
 
     extern const char* loadedKeys;
     extern const char ASCIITable[];
-    char Translate(uint8_t scancode, bool uppercase);
+    char Translate(uint16_t scancode, bool uppercase);
 }

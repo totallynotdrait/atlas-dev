@@ -7,17 +7,31 @@
 
 // I have gathered those from different Hobby online operating systems instead of getting them one by one from the manual
 
-#define REG_CTRL        0x0000
-#define REG_STATUS      0x0008
+#define CTRL_RST        0x04000000    // Device Reset
+#define CTRL_SLU        0x00000040    // Set Link Up
+#define CTRL_ASDE       0x00000020    // Auto-Speed Detection Enable
+#define CTRL_RFCE       0x00008000    // Receive Flow Control Enable
+#define CTRL_TFCE       0x00010000    // Transmit Flow Control Enable
+#define CTRL_PHY_RST    0x80000000    // PHY Reset
+
 #define REG_EEPROM      0x0014
 #define REG_CTRL_EXT    0x0018
 #define REG_IMASK       0x00D0
 #define REG_RCTRL       0x0100
-#define REG_RXDESCLO    0x2800
-#define REG_RXDESCHI    0x2804
-#define REG_RXDESCLEN   0x2808
-#define REG_RXDESCHEAD  0x2810
-#define REG_RXDESCTAIL  0x2818
+
+
+#define CTRL_LRST       0x00000008    // Link Reset
+
+#define REG_CTRL        0x0000        // Device Control Register
+#define REG_STATUS      0x0008        // Device Status Register
+#define REG_RCTL        0x0100        // Receive Control Register
+#define REG_TCTL        0x0400        // Transmit Control Register
+#define REG_RXDESCLO    0x2800        // RX Descriptor Base Low
+#define REG_RXDESCHI    0x2804        // RX Descriptor Base High
+#define REG_RXDESCLEN   0x2808        // RX Descriptor Length
+#define REG_RXDESCHEAD  0x2810        // RX Descriptor Head
+#define REG_RXDESCTAIL  0x2818        // RX Descriptor Tail
+#define REG_TIPG        0x0410        // Transmit Inter Packet Gap
 
 #define REG_TCTRL       0x0400
 #define REG_TXDESCLO    0x3800

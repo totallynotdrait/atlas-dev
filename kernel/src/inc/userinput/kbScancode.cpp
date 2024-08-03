@@ -65,7 +65,7 @@ namespace QWERTYKeyboard {
         }
     }
 
-    char Translate(uint8_t scancode, bool uppercase) {
+    char Translate(uint16_t scancode, bool uppercase) {
         if (scancode == 28) return '\n';
         if (scancode > 58) return 0;
 

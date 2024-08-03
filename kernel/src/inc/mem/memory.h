@@ -11,3 +11,4 @@ void _memset_128(void* dest, uint8_t value, int64_t size);
 void _memset(void* dest, uint8_t value, uint64_t size);
 void* memcpy(void* dest, const void* src, size_t n);
 int memcmp(void* a, void* b, size_t n);
+void* memmove(void* dest, const void* src, size_t n);

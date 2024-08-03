@@ -62,6 +62,14 @@ uint8_t hexStringToUInt8(const char* hexString) {
     return result;
 }
 
+uint64_t hexStringToUInt64(const char* hexString) {
+    uint64_t result = 0;
+    while (*hexString) {
+        result = (result << 4) | hexCharToInt(*hexString++);
+    }
+    return result;
+}
+
 void calculator_mode(char* input)
 {
     if(check_command(input, "quit")) {
@@ -81,12 +89,15 @@ void command_mode(char* input) {
         printf("echo <arg>\t\t: Prints to the screen a defined message\n");
         printf("shutdown\t\t: Shutdowns the system\n");
         printf("clear\t\t: Clears the screen\n");
+        printf("setcc\t\t: Sets the clear color background in hex, then use clear command\n");
         printf("putchar <hex>\t\t: Prints a character\n");
+        printf("getchar\t\t: Awaits a key input and prints the character\n");
         printf("--- debug commands ---\n");
         printf("kata.init.0\t\t: Does a division by 0, causing Atlas to crash\n");
         printf("kata.init.1\t\t: Does a page fault, causing Atlas to crash\n");
-        printf("kata.init.3\t\t: Causes a Non-Maskable Interrupt\n");
-
+        printf("kata.init.2\t\t: Causes a Non-Maskable Interrupt\n");
+        printf("kata.init.3\t\t: Causes a __stack_chk_fail\n");
+        printf("kata.init.4\t\t: Causes a __cxa_pure_virtual\n");
         printf("kata.test.psf\t\t: Prints all of the characters of the current PSF font (0x00 to 0xFF)");
     } else if (check_short_command(input, "echo", 4)) {
         char* msg = &input[5];
@@ -97,12 +108,15 @@ void command_mode(char* input) {
         GKRenderer->putChar((char)chr);
     } else if (check_short_command(input, "setcc", 5)) {
         const char* hex_str = &input[6];
-        uint64_t hex = hexStringToUInt8(hex_str);
+        uint64_t hex = hexStringToUInt64(hex_str);
         GKRenderer->ClearColor = hex;
     } else if (check_command(input, "clear")) {
         printf("\\c");
     } else if (check_command(input, "whoami")) {
         printf("idk, lol");
+    } else if (check_command(input, "getchar")) {
+        char res = getch();
+        printf("%c", res);
     } else if (check_command(input, "kata.init.0")) {
         int a = 1;
         int b = 0;
@@ -110,8 +124,26 @@ void command_mode(char* input) {
     } else if (check_command(input, "kata.init.1")) {
         int* t = (int*)0x80000000000;
         *t = 2;
-    } else if (check_command(input, "kata.init.3")) {
+    } else if (check_command(input, "kata.init.2")) {
         asm volatile ("outb %al, $0x92");
+    } else if (check_command(input, "kata.init.3")) {
+        char buffer[10];
+        strcpy(buffer, "This string is too long for the buffer");
+    } else if (check_command(input, "kata.init.4")) {
+        class Base {
+        public:
+            Base() {
+                pureVirtualFunction();
+            }
+            virtual void pureVirtualFunction() = 0;
+        };
+
+        class Derived : public Base {
+        public:
+            void pureVirtualFunction() override {
+                printf("Now's your chance to be big");
+            }
+        };
     } else if (check_command(input, "kata.test.psf")) {
         for(int i = 0x00; i <= 0xFF; ++i) {
             GKRenderer->putChar((char)i);
@@ -193,7 +225,13 @@ void init_ata_shell() {
 
     GKRenderer->Color = hbc.Cyan;
     printf("[Atlas shell]\n");
+
+    GKRenderer->ClearColor = hbc.Red;
+    GKRenderer->Color = hbc.White;
+    printf("FS.EXT2: OUT OF RESOURCES\n");
+
     GKRenderer->Color = hbc.Gray;
+    GKRenderer->ClearColor = hbc.Black;
 
     printf("\tKeyboard and mouse not working?\n");
     printf("\t\tYou probably using a usb keyboard or mouse which Atlas doesn't currently support.\n");

@@ -62,7 +62,7 @@ class E1000 {
         bool detectEEProm(); // Return true if EEProm exist, else it returns false and set the eerprom_existsdata member
         uint32_t eepromRead( uint8_t addr); // Read 4 bytes from a specific EEProm Address
         bool readMACAddress();       // Read MAC Address
-        //void startLink ();           // Start up the network
+        void startLink ();           // Start up the network
         void rxinit();               // Initialize receive descriptors an buffers
         void txinit();               // Initialize transmit descriptors an buffers
         void enableInterrupt();      // Enable Interrupts
@@ -70,9 +70,9 @@ class E1000 {
     public:
 
         //E1000(PCI::PCIDeviceHeader * _pciConfigHeader); // Constructor. takes as a parameter a pointer to an object that encapsulate all he PCI configuration data of the device
-        void start ();                             // perform initialization tasks and starts the driver
-        void fire (interrupt_frame * p_interruptContext);  // This method should be called by the interrupt handler 
-        uint8_t * getMacAddress ();                         // Returns the MAC address
+        bool start();                             // perform initialization tasks and starts the driver
+        void fire();  // This method should be called by the interrupt handler 
+        uint8_t * getMacAddress();                         // Returns the MAC address
         int sendPacket(const void * p_data, uint16_t p_len);  // Send a packet
         //~E1000();                                             // Default Destructor
 };

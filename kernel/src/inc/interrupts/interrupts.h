@@ -13,7 +13,7 @@
 #define ICW1_ICW4 0x01
 #define ICW4_8086 0x01
 
-typedef struct {
+struct interrupt_frame{
     uint8_t fpu_state[256];
 
     uint64_t cr4;
@@ -42,7 +42,7 @@ typedef struct {
     uint64_t rflags;
     uint64_t rsp;
     uint64_t ss;
-} interrupt_frame;
+};
 
 __attribute__((interrupt)) void syscall_Handler(interrupt_frame* frame);
 __attribute__((interrupt)) void PageFault_Handler(interrupt_frame* frame);
