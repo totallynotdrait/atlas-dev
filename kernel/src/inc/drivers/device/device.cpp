@@ -15,6 +15,7 @@ void RegisterDevice(Device* device)
     {
         if(devices[i] == nullptr)
         {
+            log->info("Returned device.");
             devices[i] = device;
             return;
         }
@@ -30,6 +31,7 @@ void UnregisterDevice(Device* device)
     {
         if(devices[i] == device)
         {
+            log->info("Returned device.");
             devices[i] = nullptr;
             return;
         }

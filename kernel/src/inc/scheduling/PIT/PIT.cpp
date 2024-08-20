@@ -1,5 +1,6 @@
 #include "PIT.h"
 #include <IO/IO.h>
+#include <kata_renderer/kata_renderer.h>
 
 namespace PIT {
     double TimeSinceBoot = 0;
@@ -11,6 +12,39 @@ namespace PIT {
             asm("hlt");
         }
         
+    }
+
+    uint8_t get_rtc_register(uint8_t reg)
+    {
+        outb(cmos_address, reg | 0x80);     // Disable NMI when sending register to read
+        io_wait();                          // Small delay
+        return inb(cmos_data);              // Return data at that register
+    }
+
+    void enable_rtc(void)
+    {
+        uint8_t prev_regB_value = get_rtc_register(0x0B);
+
+        outb(cmos_address, 0x8B);                // Select register B again, because reading a CMOS register resets to register D
+        io_wait();                               // Small delay
+        outb(cmos_data, prev_regB_value | 0x40); // Set bit 6 to enable periodic interrupts at default rate of 1024hz
+
+        get_rtc_register(0x0C);                  // Read status register C to clear out any pending IRQ8 interrupts
+    }
+
+    void disable_rtc(void)
+    {
+        uint8_t prev_regB_value;
+
+        __asm__ __volatile__ ("cli");   
+
+        prev_regB_value = get_rtc_register(0x0B);
+
+        outb(cmos_address, 0x8B);                // Select register B again, because reading a CMOS register resets to register D
+        io_wait();                               // Small delay
+        outb(cmos_data, prev_regB_value & 0xBF); // Clear bit 6 to disable periodic interrupts
+
+        __asm__ __volatile__ ("sti");   
     }
 
     void Sleep(uint64_t milliseconds) {
@@ -34,6 +68,7 @@ namespace PIT {
     }
 
     void Tick() { 
+        GKRenderer->paint();
         TimeSinceBoot += 1.0 / (double)GetFrequency();
     }
 

@@ -10,7 +10,8 @@ extern "C" uint64_t ExecuteSyscall(uint64_t p0, uint64_t p1, uint64_t p2, uint64
 extern "C" void SetupSysret();
 
 void InitialiseSyscalls();
-
+void syscall_handler(Registers* registers);
+void syscall_test();
 #define DECL_SYSCALL0(fn) uint64_t syscall_##fn();
 #define DECL_SYSCALL1(fn,p1) uint64_t syscall_##fn(p1);
 #define DECL_SYSCALL2(fn,p1,p2) uint64_t syscall_##fn(p1,p2);

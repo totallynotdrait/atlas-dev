@@ -5,6 +5,8 @@
 
 #include <mem/heap.h>
 
+#include <operators.h>
+
 #define VECTOR_DEFAULT_SIZE 2
 
 template<typename T>

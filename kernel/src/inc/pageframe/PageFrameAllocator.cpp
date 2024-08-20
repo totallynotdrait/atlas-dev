@@ -6,6 +6,8 @@ uint64_t usedMemory;
 bool Initialized = false;
 PageFrameAllocator GlobalAllocator;
 
+PageFrameAllocator* PageFrameAllocator::s_Allocator = nullptr;
+
 void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mMapSize, size_t mMapDescSize) {
     if (Initialized) return;
 
@@ -137,4 +139,16 @@ uint64_t PageFrameAllocator::GetUsedRAM() {
 
 uint64_t PageFrameAllocator::GetReservedRAM() {
     return reservedMemory;
+}
+
+
+PageFrameAllocator allocator;
+PageFrameAllocator* PageFrameAllocator::SharedAllocator()
+{
+    if(s_Allocator == nullptr)
+    {
+        s_Allocator = &allocator;
+    }
+
+    return s_Allocator;
 }

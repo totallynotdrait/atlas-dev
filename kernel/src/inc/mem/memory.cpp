@@ -1,4 +1,8 @@
 #include "memory.h"
+#include "heap.h"
+#include <pageframe/PageTableManager.h>
+
+extern PageTableManager KernelDirectory;
 
 extern "C" void __memset(void* dest, int val, size_t n);
 extern "C" void __memcpy(void* dest, const void* src, size_t n);
@@ -130,4 +134,4 @@ void _memset(void* dest, uint8_t value, uint64_t size)
     char* d = (char*)dest;
     for (uint64_t i = 0; i < size; i++)
         *(d++) = value;
-}
+};

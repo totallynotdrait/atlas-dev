@@ -14,3 +14,8 @@ namespace PIT {
     void Tick();
     void set_pit_channel_mode_frequency(const uint8_t channel, const uint8_t operating_mode, const uint16_t frequency);
 }
+
+enum {
+    cmos_address = 0x70,
+    cmos_data = 0x71 
+};

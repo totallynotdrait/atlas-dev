@@ -53,6 +53,8 @@
 #define PCI_BAR_64                      0x04
 #define PCI_BAR_PREFETCH                0x08
 
+#define PCI_BAR_MMIO 0x1
+
 namespace PCI {
     struct PCIDeviceHeader {
         uint16_t VendorID;

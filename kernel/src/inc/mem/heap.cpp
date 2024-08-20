@@ -61,6 +61,49 @@ void* malloc(size_t size) {
     return malloc(size);
 }
 
+void* alloc(uint64_t size, uint64_t alignment)
+{
+    // it is not a multiple of 0x10
+    if ((size % 0x10) > 0)
+    { 
+        size -= (size % 0x10);
+        size += 0x10;
+    }
+
+    if (size == 0) 
+    {
+        return nullptr;
+    }
+
+    HeapSegHeader* currentSeg = (HeapSegHeader*) heapStart;
+    while(true)
+    {
+        if(currentSeg->free)
+        {
+            if (currentSeg->length > size)
+            {
+                currentSeg->Split(size);
+            }
+
+            if (!(currentSeg->length < size))
+            {
+                currentSeg->free = false;
+                return (void*)((uint64_t)currentSeg + sizeof(HeapSegHeader));
+            }
+        }
+
+        if (currentSeg->next == nullptr) 
+        {
+            break;
+        }
+
+        currentSeg = currentSeg->next;
+    }
+
+    ExpandHeap(size);
+    return alloc(size, alignment);
+}
+
 HeapSegHeader* HeapSegHeader::Split(size_t splitLength) {
     if (splitLength < 0x10) return NULL;
     int64_t splitSegLength = length - splitLength - (sizeof(HeapSegHeader));
@@ -118,4 +161,73 @@ void HeapSegHeader::CombineForward() {
 
 void HeapSegHeader::CombineBackwward() {
     if (last != NULL && last->free) last->CombineForward();
+}
+
+
+extern uint64_t _KAtaEnd;
+uint64_t free_mem_addr = (uint64_t)&_KAtaEnd;
+
+uint8_t heap_init = 0;
+
+extern PageTableManager KernelDirectory;
+uint64_t kmalloc_int(uint64_t size, int align, uint64_t* phys_addr)
+{
+    if(heap_init == 0)
+    {
+        if (align == 1 && (free_mem_addr & 0x00000FFF)) 
+        {
+            free_mem_addr &= 0xFFFFF000;
+            free_mem_addr += 0x1000;
+        }
+
+        if (phys_addr) 
+        {
+            *phys_addr = free_mem_addr;
+        }
+
+        uint64_t ret = free_mem_addr;
+        free_mem_addr += size;
+
+        return ret;
+    }
+    else
+    {
+        void* addr = alloc(size);
+
+        if (phys_addr != 0)
+        {
+            uint64_t phys = KernelDirectory.PhysicalAddress((uint64_t)addr);
+            *phys_addr = (phys + ((uint64_t)addr & 0xFFF));
+        }
+
+        return (uint64_t)addr;
+    }
+}
+
+void kfree(void* ptr)
+{
+    if(heap_init == 1)
+    {
+        free(ptr);
+    }
+}
+
+uint64_t kmalloc_a(uint64_t size)
+{
+    return kmalloc_int(size, 1, 0);
+}
+
+uint64_t kmalloc_p(uint64_t size, uint64_t* phys)
+{
+    return kmalloc_int(size, 0, phys);
+}
+
+uint64_t kmalloc_ap(uint64_t size, uint64_t* phys)
+{
+    return kmalloc_int(size, 1, phys);
+}
+
+uint64_t kmalloc(uint64_t size)
+{
+    return kmalloc_int(size, 0, 0);
 }

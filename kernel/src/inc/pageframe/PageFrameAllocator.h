@@ -17,8 +17,10 @@ class PageFrameAllocator {
     uint64_t GetFreeRAM();
     uint64_t GetUsedRAM();
     uint64_t GetReservedRAM();
+    static PageFrameAllocator* SharedAllocator();
 
     private:
+    static PageFrameAllocator* s_Allocator;
     void InitBitmap(size_t bitmapSize, void* bufferAddress);
     void ReservePage(void* address);
     void ReservePages(void* address, uint64_t pageCount);

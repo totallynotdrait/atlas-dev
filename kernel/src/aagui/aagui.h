@@ -1,6 +1,7 @@
 #pragma once
 #include "rendering/BasicColors.h"
 #include "window/window.h"
+#include "asciibasic/asciibasic.h"
 
 extern KAtaRenderer* aaguir;
 

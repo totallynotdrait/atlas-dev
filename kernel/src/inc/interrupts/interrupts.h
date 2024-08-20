@@ -2,6 +2,7 @@
 #include <kata_renderer.h>
 #include <userinput/mouse.h>
 #include <log.h>
+#include <syscall/syscall.h>
 
 #define PIC1_COMMAND 0x20
 #define PIC1_DATA 0x21
@@ -44,7 +45,7 @@ struct interrupt_frame{
     uint64_t ss;
 };
 
-__attribute__((interrupt)) void syscall_Handler(interrupt_frame* frame);
+__attribute__((interrupt)) void syscall_IntHandler(Registers* frame);
 __attribute__((interrupt)) void PageFault_Handler(interrupt_frame* frame);
 __attribute__((interrupt)) void DoubleFault_Handler( interrupt_frame* frame);
 __attribute__((interrupt)) void GPFault_Handler(interrupt_frame* frame);

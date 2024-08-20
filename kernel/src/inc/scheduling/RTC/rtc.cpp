@@ -2,6 +2,8 @@
 
 #include <IO/IO.h>
 
+tm *timedate;
+
 uint8_t GetYearRTC()
 {
 	outb(0x70, 0x09);
@@ -46,7 +48,9 @@ uint8_t GetSecondRTC()
 
 void InitRTC(struct tm* kernel_time)
 {
+	log->print("Initializing Real Time Clock (RTC)...");
 	GetTimeRTC(kernel_time);
+	log->print("Initialized Real Time Clock (RTC).");
 }
 
 void GetTimeRTC(struct tm* tm)
@@ -57,4 +61,9 @@ void GetTimeRTC(struct tm* tm)
 	tm->hour = GetHourRTC();
 	tm->minute = GetMinuteRTC();
 	tm->second = GetSecondRTC();
+}
+
+uint8_t BCDToBinary(uint8_t bcd)
+{
+    return ((bcd / 16) * 10) + (bcd % 16);
 }

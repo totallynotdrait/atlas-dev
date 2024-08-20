@@ -3,6 +3,8 @@
 #include <mem/heap.h>
 #include <IO/IO.h>
 #include <liba/stdio.h>
+#include <data_structures/vector.h>
+#include <drivers/usb/uhci/uhci.h>
 
 namespace PCI {
     void EnumerateFunction(uint64_t deviceAddress, uint64_t function) {
@@ -17,12 +19,19 @@ namespace PCI {
 
         printf("%s / %s / %s / %s / %s \n", GetVendorName(pciDeviceHeader->VendorID), GetDeviceName(pciDeviceHeader->VendorID, pciDeviceHeader->DeviceID), DeviceClasses[pciDeviceHeader->Class], GetSubclassName(pciDeviceHeader->Class, pciDeviceHeader->Subclass), GetProgIFName(pciDeviceHeader->ProgIF, pciDeviceHeader->Class, pciDeviceHeader->Subclass));
         switch (pciDeviceHeader->Class) {
-            case 0x01:
+            case 0x01: // mass storage controller
                 switch (pciDeviceHeader->Subclass) {
-                    case 0x06:
+                    case 0x06: // Serial ATA
                         switch (pciDeviceHeader->ProgIF) {
-                            case 0x01:
-                                new AHCI::AHCIDriver(pciDeviceHeader);
+                            case 0x01: // AHCI 1.0 device
+                                log->info("Found Serial ATA AHCI Device 1.0: %s / %s / %s / %s / %s", GetVendorName(pciDeviceHeader->VendorID), GetDeviceName(pciDeviceHeader->VendorID, pciDeviceHeader->DeviceID), DeviceClasses[pciDeviceHeader->Class], GetSubclassName(pciDeviceHeader->Class, pciDeviceHeader->Subclass), GetProgIFName(pciDeviceHeader->ProgIF, pciDeviceHeader->Class, pciDeviceHeader->Subclass));
+                                /* AHCI::AHCIDriver* driver = new AHCI::AHCIDriver(pciDeviceHeader);
+                                vector<AHCI::AHCIDevice*> devices = driver->PreparePorts();
+
+                                for (uint32_t i = 0; i < devices.size(); i++) {
+                                    RegisterDevice(devices[i]);
+                                } */
+                                break;
                         }
                     }
             case 0x0C: // Serial BUS Controller
@@ -30,19 +39,23 @@ namespace PCI {
                     case 0x03: // USB Controller
                         switch (pciDeviceHeader->ProgIF) {
                             case 0x00: // UHCI
-                                log->warn("UHCI USB Controller was found and implemented, but not initialized.");
+                                log->info("Found OHCI USB Controller.");
+                                InitialiseUHCI(PCI_MAKE_ID(pciDeviceHeader->Class, pciDeviceHeader->Subclass, pciDeviceHeader->ProgIF),
+                                    pciDeviceHeader);
                                 break;
 
                             case 0x10: //OHCI
-                                log->warn("OHCI USB Controller was found and implemented, but not initialized.");
+                                log->info("Found OHCI USB Controller.");
                                 break;
 
                             case 0x20: //EHCI
-                                log->warn("EHCI USB Controller was found and implemented, but not initialized.");
+                                log->info("Found EHCI USB Controller.");
+                                
                                 break;
 
                             case 0x30: //XHCI
-                                log->warn("XHCI USB Controller was found and implemented, but not initialized.");
+                                log->info("Found XHCI USB Controller.");
+                                
                                 break;
                         }
                 }

@@ -80,10 +80,8 @@ void KAtaRenderer::printf(const char* str) {
 }
 
 void KAtaRenderer::drawCursor(bool on) {
-    uint64_t font_height = 8;
     uint32_t color = on ? KAtaRenderer::Color : KAtaRenderer::ClearColor;
-    drawRect(CursorPosition.X * 16, CursorPosition.Y * 8 + (8 / 4 * 3),
-            16, 8 / 4, color, true);
+    drawRect(CursorPosition.X, CursorPosition.Y, 8, 16, color, true);
     
 }
 
@@ -104,7 +102,15 @@ void KAtaRenderer::scroll_up(FrameBuffer fb) {
 
     void* base_addr = fb.BaseAddress;
 
+    // Ensure memory alignment
+    if (((uint64_t)base_addr % bytes_per_pixel) != 0) {
+        return;
+    }
+
+    // Perform the scroll
     memmove(base_addr, (void*)((uint64_t)base_addr + row_size * char_height), copy_size);
+
+    // Clear the new area
     void* clear_start_addr = (void*)((uint64_t)base_addr + copy_size);
     memset(clear_start_addr, 0, row_size * char_height);
 }
@@ -225,12 +231,10 @@ void KAtaRenderer::DrawOverlayMouseCursor(uint8_t* mouseCursor, Point position, 
 }
 
 void KAtaRenderer::paint() {
-    PIT::Sleep(10000);
-    isCursorVisible = !isCursorVisible;
-
+    /* isCursorVisible = true;
     if (isCursorVisible) {
         KAtaRenderer::drawCursor(true);
     } else {
         KAtaRenderer::drawCursor(false);
-    }
+    } */
 }

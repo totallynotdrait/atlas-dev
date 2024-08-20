@@ -13,8 +13,14 @@
 #include <syscall/syscall.h>
 #include <pageframe/PageFrameAllocator.h>
 #include <mem/heap.h>
+#include <scheduling/RTC/rtc.h>
+#include <aagui/aagui.h>
+#include <basesystem.h>
+#include <xxd.h>
 
 #define MAX_TOKENS 128
+
+basesystem bs;
 
 int check_command(char* cmd, const char* text)
 {
@@ -79,19 +85,31 @@ void calculator_mode(char* input)
     state = CALCULATOR_MODE;
 }
 
+void div0() {
+    45/0;
+}
+
 void command_mode(char* input) {
     if(check_command(input, "help")) {
-        printf("[Atlas shell] commands:\n");
+        printf("[Atlas shell] b1.0 commands:\n");
+        printf("The listed commands are defined internally.\n");
         printf("usage: [command] [option] ...\n");
         printf("Commands (built-in atlas shell):\n");
         printf("help\t\t: Displays this menu\n");
-        printf("exit\t\t: no\n");
+        printf("exit\t\t: Ex\n");
         printf("echo <arg>\t\t: Prints to the screen a defined message\n");
         printf("shutdown\t\t: Shutdowns the system\n");
+        printf("reboot\t\t: Reboots the system\n");
         printf("clear\t\t: Clears the screen\n");
-        printf("setcc\t\t: Sets the clear color background in hex, then use clear command\n");
+        printf("setcc\t\t: Sets the clear color background in hex (use then the clear command)\n");
         printf("putchar <hex>\t\t: Prints a character\n");
         printf("getchar\t\t: Awaits a key input and prints the character\n");
+        printf("xxd\t\t: Displays the specified string into a Hex Dump, (later in files if ext2 is implemented)\n");
+        printf("gettime\t\t: Prints the current date and time using RTC\n");
+        printf("--- not so useful commands ---\n");
+        printf("whoami\t\t: idk\n");
+        printf("moo\t\t: idk\n");
+        printf("forse\t\t: zero\n");
         printf("--- debug commands ---\n");
         printf("kata.init.0\t\t: Does a division by 0, causing Atlas to crash\n");
         printf("kata.init.1\t\t: Does a page fault, causing Atlas to crash\n");
@@ -102,6 +120,9 @@ void command_mode(char* input) {
     } else if (check_short_command(input, "echo", 4)) {
         char* msg = &input[5];
         printf(msg);
+    } else if (check_short_command(input, "xxd", 3)) {
+        char* msg = &input[4];
+        xxd(msg, strlen(msg));
     } else if (check_short_command(input, "putchar", 7)) {
         const char* chr_str = &input[8];
         uint8_t chr = hexStringToUInt8(chr_str);
@@ -112,15 +133,45 @@ void command_mode(char* input) {
         GKRenderer->ClearColor = hex;
     } else if (check_command(input, "clear")) {
         printf("\\c");
+    } else if (check_command(input, "gettime")) {
+        GetTimeRTC(timedate);
+        printf("%d:%d:%d %d/%d/%d", BCDToBinary(timedate->hour), BCDToBinary(timedate->minute), BCDToBinary(timedate->second), BCDToBinary(timedate->day), BCDToBinary(timedate->month), BCDToBinary(timedate->year));
+    } else if (check_command(input, "shutdown")) {
+        bs.shutdown();
+    } else if (check_command(input, "reboot")) {
+        bs.reboot();
     } else if (check_command(input, "whoami")) {
-        printf("idk, lol");
+        printf("+------------------------------------------------+\n");
+        printf("|                                                |\n");
+        printf("| you are now booted to atlas shell              |\n");
+        printf("| you may not see this menu correctly            |\n");
+        printf("|                                                |\n");
+        printf("| atlas uses ASCII Basic interface because       |\n");
+        printf("| i can't add those psf extended characters xd   |\n");
+        printf("|                                                |\n");
+        printf("|                                                |\n");
+        printf("|                                                |\n");
+        printf("|                                                |\n");
+        printf("|                                                |\n");
+        printf("|                                                |\n");
+        printf("| btw atlas doesn't have Super Cow Powers        |\n");
+        printf("|                                                |\n");
+        printf("+------------------------------------------------+\n");
+        makeRectangle(80, 150, 50, 16);
+        printf("porco dio");
+    } else if (check_command(input, "moo")) {
+        printf("         (__)  \n");
+        printf("         (oo)  \n");
+        printf("   /------\\/  \n");
+        printf("  / |    ||  \n");
+        printf(" *  /\\---/\\  \n");
+        printf("    ~~   ~~  \n");
+        printf("....\"Have you mooed today?\"...\n");
     } else if (check_command(input, "getchar")) {
         char res = getch();
         printf("%c", res);
     } else if (check_command(input, "kata.init.0")) {
-        int a = 1;
-        int b = 0;
-        a/b;
+        div0();
     } else if (check_command(input, "kata.init.1")) {
         int* t = (int*)0x80000000000;
         *t = 2;
@@ -182,12 +233,13 @@ void init_ata_shell() {
 
     printf("\\c");
     GKRenderer->Color = 0x76b845;
+    GetTimeRTC(timedate);
     printf("___ooo_____oo____ooo__________________\t\t[atlas-dev]\n"); GKRenderer->Color = 0xf2be2e;
     printf("_oo___oo___oo_____oo____ooooo___oooo__\t\tTotal memory: %d GB\n", totalRam/1073741824); GKRenderer->Color = 0xe19433;
     printf("oo_____oo_oooo____oo___oo___oo_oo___o_\t\tFree memory: %d GB\n", freeRam/1073741824); GKRenderer->Color = 0xc55152;
     printf("ooooooooo__oo_____oo___oo___oo___oo___\t\tUsed memory: %d MB\n", usedRam/1048576); GKRenderer->Color = 0xea4c89;
     printf("oo_____oo__oo__o__oo___oo___oo_o___oo_\t\tReserved memory: %d MB\n", reservedRam/1048576); GKRenderer->Color = 0x009edc;
-    printf("oo_____oo___ooo__ooooo__oooo_o__oooo__\t\t\n"); 
+    printf("oo_____oo___ooo__ooooo__oooo_o__oooo__\t\t%d:%d:%d %d/%d/%d\n", BCDToBinary(timedate->hour), BCDToBinary(timedate->minute), BCDToBinary(timedate->second), BCDToBinary(timedate->day), BCDToBinary(timedate->month), BCDToBinary(timedate->year)); 
     printf("______________________________________\t\t");
     
     GKRenderer->Color = hbc.White;
@@ -229,9 +281,12 @@ void init_ata_shell() {
     GKRenderer->ClearColor = hbc.Red;
     GKRenderer->Color = hbc.White;
     printf("FS.EXT2: OUT OF RESOURCES\n");
-
     GKRenderer->Color = hbc.Gray;
     GKRenderer->ClearColor = hbc.Black;
+
+    __asm__ __volatile__ (
+        "int $0x80\n"      // Correctly specify the interrupt
+    );
 
     printf("\tKeyboard and mouse not working?\n");
     printf("\t\tYou probably using a usb keyboard or mouse which Atlas doesn't currently support.\n");
@@ -239,6 +294,9 @@ void init_ata_shell() {
     printf("\t\tYour computer probably doesn't have a PC Speaker.\n");
     printf("\tHave a certain amount of RAM like 16 GB but it shows 15 GB?\n");
     printf("\t\tIt's normal, probably a few 100 or 200 MB of memory are reserved.\n\n");
+
+    printf("NOTE: This is not completely userspace, Atlas Shell may be used on like a sort of 'alternative indipendent' shell or for rescue.\n\n");
+
     while (true) {
         char cmdbuffer[256] = "";
         GKRenderer->Color = 0x009edc; printf("atlas@shell "); GKRenderer->Color = 0xea4c89; printf("~ "); GKRenderer->Color = hbc.Gray; printf("> "); GKRenderer->Color = hbc.Gray;

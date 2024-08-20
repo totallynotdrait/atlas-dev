@@ -66,10 +66,11 @@ void basesystem::shutdown() {
     log->print("Cloud Hypervisor...");
     outw(0x604, 0x2000);
     log->failed("Failed to shutdown system.");
+    log->warn("ACPI not compatible or enabled. Your computer is safe to shutdown.");
 }
 
 void basesystem::execute_elf(const char* elf_path) {
-    printf("Running %d :: wowo accessing USA goverment servers... omg.\n");
+    printf("Running %d :: wowo accessing USA goverment servers... omg.\n", elf_path);
 }
 
 void basesystem::enableMCE() {
@@ -122,7 +123,7 @@ void basesystem::playBootSound(const char* boot) {
     } else if (strcmp(boot, "beep") == 0) {
         enable_pc_speaker();
         play_note(NoteFrequency::A4, 2050);
-        PIT::Sleepd(1050);
+        PIT::Sleepd(1);
         disable_pc_speaker();
     } else {
         log->failed("No boot sound, unknown boot sound.");

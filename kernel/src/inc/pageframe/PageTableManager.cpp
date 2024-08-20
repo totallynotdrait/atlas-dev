@@ -62,3 +62,22 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory) {
     PDE.SetFlag(PT_Flag::ReadWrite, true);
     PT->entries[indexer.P_i] = PDE;
 }
+
+paddr_t PageTableManager::PhysicalAddress(vaddr_t virtualAddress)
+{
+    PageMapIndexer indices(virtualAddress);
+
+    PageDirectoryEntry pml4_entry = pml4->entries[indices.PDP_i];
+    PageTable* pdp = (PageTable*)(uint64_t)(pml4_entry.GetAddress() << 12);
+
+    PageDirectoryEntry pdp_entry = pdp->entries[indices.PD_i];
+    PageTable* pd = (PageTable*)(uint64_t)(pdp_entry.GetAddress() << 12);
+
+    PageDirectoryEntry pd_entry = pd->entries[indices.PT_i];
+    PageTable* pt = (PageTable*)(uint64_t)(pd_entry.GetAddress() << 12);
+
+    PageDirectoryEntry pt_entry = pt->entries[indices.P_i];
+    uint64_t address = pt_entry.GetAddress() << 12;
+
+    return address;
+}

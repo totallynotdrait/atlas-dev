@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 
-
 #define USB_DESC_DEVICE                 0x01
 #define USB_DESC_CONF                   0x02
 #define USB_DESC_STRING                 0x03

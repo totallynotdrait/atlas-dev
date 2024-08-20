@@ -63,7 +63,7 @@ void PrepareInterrupts() {
 	idtr.Limit = 0x0FFF;
 	idtr.Offset = (uint64_t)GlobalAllocator.RequestPage();
 
-	SetIDTGate((void*)syscall_Handler, 0x80, IDT_TA_InterruptGate, 0x08); // wanted to do 0x69 as interrupt vector
+	SetIDTGate((void*)syscall_IntHandler, 0x80, IDT_TA_InterruptGate, 0x08); // wanted to do 0x69 as interrupt vector
 	SetIDTGate((void*)PageFault_Handler, 0xE, IDT_TA_InterruptGate, 0x08);
 	SetIDTGate((void*)DoubleFault_Handler, 0x8, IDT_TA_InterruptGate, 0x08);
 	SetIDTGate((void*)GPFault_Handler, 0xD, IDT_TA_InterruptGate, 0x08);

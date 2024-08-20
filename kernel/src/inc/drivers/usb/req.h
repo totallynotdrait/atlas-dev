@@ -1,7 +1,5 @@
 #pragma once
-
 #include <stdint.h>
-
 
 #define RT_TRANSFER_MASK                0x80
 #define RT_DEV_TO_HOST                  0x80

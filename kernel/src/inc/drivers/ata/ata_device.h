@@ -7,7 +7,7 @@ class ATADevice : public Device
 {
 public:
     ATADevice() {}
-    ~ATADevice() {}
+    virtual ~ATADevice() {}
 
     DeviceType GetType() { return DeviceType::ATA_PIO; };
 

@@ -73,12 +73,22 @@ extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
     // main
     log->ok("Atlas initialized succefully.");
 
-    char* res;
-    scanf(":: start ata shell?\n[y]es, [n]o /? %s", res);
+    /* char* res;
+    printf(":: start ata shell?\n[y]es, [n]o --: ");
+    scanf("%s", res);
     if (strcmp(res, "y") == 0) {
         init_ata_shell();
     } else {
         while (true);
+    } */
+
+    //init_ata_shell();
+
+    // avoid computer to stop
+    while (true)
+    {
+        asm __volatile__ ("hlt");
     }
+    
     
 }

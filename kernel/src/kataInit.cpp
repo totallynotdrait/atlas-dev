@@ -1,6 +1,12 @@
 #include "kataInit.h"
 #include <acpi/rsdp.h>
 #include <drivers/serial/serial.h>
+#include <drivers/device/device.h>
+#include <drivers/ata/ata_device.h>
+#include <scheduling/RTC/rtc.h>
+#include <liba/stdlib.h>
+#include <fs/ext2.h>
+#include <fs/vfs.h>
 
 KAtaRenderer r = KAtaRenderer(NULL, NULL);
 KAtaRenderer ar = KAtaRenderer(NULL, NULL);
@@ -28,7 +34,7 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 	gdtDescriptor.Offset = (uint64_t)&DefaultGDT;
 	LoadGDT(&gdtDescriptor);
 	log->ok("Loaded GDTDescriptor.");
-	
+
 	PrepareMemory(BootInfo);
 
 	bs.enableMCE();
@@ -52,7 +58,7 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 	GKRenderer->printf(" MB");
 	GKRenderer->Next();
 
-	PIT::SetDivisor(65536);
+	PIT::SetFrequency(65536);
 
 	
 
@@ -84,14 +90,18 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 		PIT::Sleepd(2);
 	}
 
-
 	serial_init();
+
+	InitialiseDevices();
+	ATADevice* ataDevice = new ATADevice();
+	RegisterDevice(ataDevice);
+	
+
+	InitRTC(timedate);
 
 	bs.playBootSound("beep");
 	
 	log->ok("KAta ready.");
-	
-
 
 	return kataInfo;
 }

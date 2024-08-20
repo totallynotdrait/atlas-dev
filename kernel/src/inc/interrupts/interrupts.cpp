@@ -5,7 +5,8 @@
 #include <scheduling/PIT/PIT.h>
 #include <liba/stdio.h>
 
-__attribute__((interrupt)) void syscall_Handler(interrupt_frame* frame) {
+
+__attribute__((interrupt)) void syscall_IntHandler(Registers* frame) {
     int syscall = frame->rax;
     frame->rax = 0;
     
@@ -36,13 +37,8 @@ __attribute__((interrupt)) void syscall_Handler(interrupt_frame* frame) {
     log->info(to_hexstring(frame->rflags));
     log->info(to_hexstring(frame->rsp));
     log->info(to_hexstring(frame->ss)); */
-
-    uint64_t rbx;
-    asm ("movq %%rbx, %0" : "=r" (rbx));
-
-    char* str = (char*)rbx;
-    GKRenderer->printf(to_string((uint64_t)str));
-    
+    syscall_handler(frame);
+    SetupSysret();
 }
 
 // fault handlers
@@ -60,7 +56,7 @@ __attribute__((interrupt)) void GPFault_Handler(interrupt_frame* frame) {
 }
 __attribute__((interrupt)) void DEE_Handler(interrupt_frame* frame) {
     log->failed("[INTERNAL_SYSTEM] [DIVISION_ERROR] Please stop trying to crash atlas or create a black hole inside the computer."); // sincerely...
-    while (true);
+    frame->rbx += 10;
 }
 __attribute__((interrupt)) void D_Handler(interrupt_frame* frame) {
     Panic("hello debug", frame);

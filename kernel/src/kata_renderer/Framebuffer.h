@@ -1,5 +1,6 @@
 #pragma once
 #include <stddef.h>
+#include <stdint.h>
 
 struct FrameBuffer {
 	void* BaseAddress;
@@ -7,4 +8,5 @@ struct FrameBuffer {
 	unsigned int Width;
 	unsigned int Height;
 	unsigned int PixelsPerScanline;
+	uint32_t bpp, pitch;
 };

@@ -27,7 +27,7 @@ void Ext2::Init() {
     read_superblock();
 
     log->print("Allocating memory for the block group descriptors...");
-    fs.bgds = (struct bgd_t *)malloc(sizeof(struct bgd_t) * fs.total_groups);
+    fs.bgds = (struct bgd_t *)kmalloc(sizeof(struct bgd_t) * fs.total_groups);
     if (fs.bgds == NULL) {
         Panic("EXT2_BGDS_MEMORY_ALLOCATION_FAILURE", nullptr);
         while (true);
@@ -38,7 +38,7 @@ void Ext2::Init() {
 }
 
 void Ext2::read_superblock() {
-    fs.sb = (struct fs_base_superblock *)malloc(sizeof(struct fs_base_superblock));
+    fs.sb = (struct fs_base_superblock *)kmalloc(sizeof(struct fs_base_superblock));
     if (fs.sb == NULL) {
         Panic("EXT2_SUPERBLOCK_MEMORY_ALLOCATION_FAILURE", nullptr);
         while (true);
@@ -94,7 +94,7 @@ uint32_t Ext2::get_block_from_offset(struct inode_t *inode, uint32_t offset) {
         uint32_t block_size = fs.block_size / sizeof(uint32_t);
 
         if (block < block_size) {
-            uint32_t *indirect_block = (uint32_t *)malloc(fs.block_size);
+            uint32_t *indirect_block = (uint32_t *)kmalloc(fs.block_size);
             ReadBlock(inode->blocks[EXT2_DIRECT_BLOCKS], indirect_block);
             uint32_t block_num = indirect_block[block];
             free(indirect_block);
@@ -103,10 +103,10 @@ uint32_t Ext2::get_block_from_offset(struct inode_t *inode, uint32_t offset) {
 
         block -= block_size;
         if (block < block_size * block_size) {
-            uint32_t *double_indirect_block = (uint32_t *)malloc(fs.block_size);
+            uint32_t *double_indirect_block = (uint32_t *)kmalloc(fs.block_size);
             ReadBlock(inode->blocks[EXT2_DIRECT_BLOCKS + 1], double_indirect_block);
             uint32_t indirect_block_index = block / block_size;
-            uint32_t *indirect_block = (uint32_t *)malloc(fs.block_size);
+            uint32_t *indirect_block = (uint32_t *)kmalloc(fs.block_size);
             ReadBlock(double_indirect_block[indirect_block_index], indirect_block);
             uint32_t block_num = indirect_block[block % block_size];
             free(indirect_block);
@@ -115,13 +115,13 @@ uint32_t Ext2::get_block_from_offset(struct inode_t *inode, uint32_t offset) {
         }
 
         block -= block_size * block_size;
-        uint32_t *triple_indirect_block = (uint32_t *)malloc(fs.block_size);
+        uint32_t *triple_indirect_block = (uint32_t *)kmalloc(fs.block_size);
         ReadBlock(inode->blocks[EXT2_DIRECT_BLOCKS + 2], triple_indirect_block);
         uint32_t double_indirect_block_index = block / (block_size * block_size);
-        uint32_t *double_indirect_block = (uint32_t *)malloc(fs.block_size);
+        uint32_t *double_indirect_block = (uint32_t *)kmalloc(fs.block_size);
         ReadBlock(triple_indirect_block[double_indirect_block_index], double_indirect_block);
         uint32_t indirect_block_index = (block / block_size) % block_size;
-        uint32_t *indirect_block = (uint32_t *)malloc(fs.block_size);
+        uint32_t *indirect_block = (uint32_t *)kmalloc(fs.block_size);
         ReadBlock(double_indirect_block[indirect_block_index], indirect_block);
         uint32_t block_num = indirect_block[block % block_size];
         free(indirect_block);
@@ -138,9 +138,9 @@ struct inode_t *Ext2::get_inode(uint32_t inode_num) {
     struct bgd_t *bgd = &fs.bgds[block_group];
     uint32_t inode_table_block = bgd->inode_table + (index * sizeof(struct inode_t)) / fs.block_size;
     uint32_t inode_table_offset = (index * sizeof(struct inode_t)) % fs.block_size;
-    char *buffer = (char *)malloc(fs.block_size);
+    char *buffer = (char *)kmalloc(fs.block_size);
     ReadBlock(inode_table_block, buffer);
-    struct inode_t *inode = (struct inode_t *)malloc(sizeof(struct inode_t));
+    struct inode_t *inode = (struct inode_t *)kmalloc(sizeof(struct inode_t));
     memcpy(inode, buffer + inode_table_offset, sizeof(struct inode_t));
     free(buffer);
     return inode;
@@ -149,7 +149,7 @@ struct inode_t *Ext2::get_inode(uint32_t inode_num) {
 uint32_t Ext2::find_free_inode() {
     for (uint32_t group = 0; group < fs.total_groups; group++) {
         struct bgd_t *bgd = &fs.bgds[group];
-        char *bitmap = (char *)malloc(fs.block_size);
+        char *bitmap = (char *)kmalloc(fs.block_size);
         ReadBlock(bgd->inode_bitmap, bitmap);
 
         for (uint32_t i = 0; i < fs.inodes_per_group / 8; i++) {
@@ -170,7 +170,7 @@ uint32_t Ext2::find_free_inode() {
 uint32_t Ext2::find_free_block() {
     for (uint32_t group = 0; group < fs.total_groups; group++) {
         struct bgd_t *bgd = &fs.bgds[group];
-        char *bitmap = (char *)malloc(fs.block_size);
+        char *bitmap = (char *)kmalloc(fs.block_size);
         ReadBlock(bgd->block_bitmap, bitmap);
 
         for (uint32_t i = 0; i < fs.block_size; i++) {
@@ -197,7 +197,7 @@ void Ext2::make_dir(struct vfs_node_t *parent_node, const char *name, uint16_t p
     }
 
     // Initialize the new inode
-    struct inode_t *inode = (inode_t *)malloc(sizeof(inode_t));
+    struct inode_t *inode = (inode_t *)kmalloc(sizeof(inode_t));
     memset(inode, 0, sizeof(inode_t));
     inode->size = fs.block_size;
     inode->blocks[0] = block_num;
@@ -209,7 +209,7 @@ void Ext2::make_dir(struct vfs_node_t *parent_node, const char *name, uint16_t p
     struct bgd_t *bgd = &fs.bgds[block_group];
     uint32_t inode_table_block = bgd->inode_table + (index * sizeof(struct inode_t)) / fs.block_size;
     uint32_t inode_table_offset = (index * sizeof(struct inode_t)) % fs.block_size;
-    char *buffer = (char *)malloc(fs.block_size);
+    char *buffer = (char *)kmalloc(fs.block_size);
     ReadBlock(inode_table_block, buffer);
     memcpy(buffer + inode_table_offset, inode, sizeof(struct inode_t));
     WriteBlock(inode_table_block, buffer);
@@ -251,7 +251,7 @@ void Ext2::make_dir(struct vfs_node_t *parent_node, const char *name, uint16_t p
     parent_node->size++;
 
     // Read the parent directory's block
-    struct dirent *dir_entries = (struct dirent *)malloc(fs.block_size);
+    struct dirent *dir_entries = (struct dirent *)kmalloc(fs.block_size);
     ReadBlock(parent_node->inode_num, dir_entries);
     uint32_t offset = 0;
 

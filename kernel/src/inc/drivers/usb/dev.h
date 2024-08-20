@@ -1,8 +1,5 @@
 #pragma once
-
-#include "req.h"
-#include "desc.h"
-
+#include <stdint.h>
 
 #define USB_STRING_SIZE                 127
 
@@ -10,6 +7,9 @@
 #define USB_FULL_SPEED                  0x00
 #define USB_LOW_SPEED                   0x01
 #define USB_HIGH_SPEED                  0x02
+
+#include "req.h"
+#include "desc.h"
 
 // USB Endpoint
 typedef struct USBEndpoint
