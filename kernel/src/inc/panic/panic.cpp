@@ -2,7 +2,6 @@
 #include <liba/stdio.h>
 #include <scheduling/PIT/PIT.h>
 #include <aagui/aagui.h>
-#include <xxd.h>
 #include <liba/string.h>
 
 extern int panic_screen = 1;
@@ -36,11 +35,8 @@ void Panic(const char* panicMessage, interrupt_frame* regs) {
         GKRenderer->CursorPosition.Y = 0;
         printf("KERNEL PANIC [%s]\n\nStack:\n", panicMessage);
         printf("Interrupt Number (%d)\n", regs->interrupt_number);
-        printf(to_hexstring(regs->interrupt_number));
         printf("\nError Code (%d)\n", regs->error_code);
-        printf(to_hexstring(regs->error_code));
         printf("\nRFLAGS (%d)\n", regs->rflags);
-        printf(to_hexstring(regs->rflags));
         printf("\n\nEnd Of Line for Stack:\n");
         printf("See Atlas Documentation for guidance: https://github.com/totallynotdrait/atlas-dev");
 

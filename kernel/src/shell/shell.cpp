@@ -296,7 +296,7 @@ void init_ata_shell() {
     printf("\t\tIt's normal, probably a few 100 or 200 MB of memory are reserved.\n\n");
 
     printf("NOTE: This is not completely userspace, Atlas Shell may be used on like a sort of 'alternative indipendent' shell or for rescue.\n\n");
-
+    
     while (true) {
         char cmdbuffer[256] = "";
         GKRenderer->Color = 0x009edc; printf("atlas@shell "); GKRenderer->Color = 0xea4c89; printf("~ "); GKRenderer->Color = hbc.Gray; printf("> "); GKRenderer->Color = hbc.Gray;

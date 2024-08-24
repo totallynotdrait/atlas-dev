@@ -5,8 +5,7 @@
 #include <drivers/ata/ata_device.h>
 #include <scheduling/RTC/rtc.h>
 #include <liba/stdlib.h>
-#include <fs/ext2.h>
-#include <fs/vfs.h>
+#include <fs/fat32/fat32.h>
 
 KAtaRenderer r = KAtaRenderer(NULL, NULL);
 KAtaRenderer ar = KAtaRenderer(NULL, NULL);
@@ -92,10 +91,12 @@ KAtaInfo InitializeKAta(BootInfo* BootInfo) {
 
 	serial_init();
 
-	InitialiseDevices();
+	// temporarely disabled
+	
+	/* InitialiseDevices();
 	ATADevice* ataDevice = new ATADevice();
 	RegisterDevice(ataDevice);
-	
+	LocateFilesystemsFAT32(devices[0]); */
 
 	InitRTC(timedate);
 

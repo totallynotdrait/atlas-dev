@@ -24,49 +24,6 @@
 #include <drivers/ata/ata_device.h>
 #include <liba/string.h>
 
-// use just for testing
-void create_directory_example() {
-    log->print("Initializing Ext2 FileSystem...");
-    
-    ATADevice* ataDevice = new ATADevice();
-    log->info(to_hexstring((uint64_t)ataDevice));
-    Ext2* ext2 = new Ext2(ataDevice);
-    ext2->Init();
-
-
-    vfs_node_t root;
-    memset(&root, 0, sizeof(vfs_node_t));
-    root.name[0] = '/';
-    root.name[1] = '\0';
-    root.inode_num = 2;
-    root.size = 0;
-    root.device = ataDevice;
-    root.fs_type = VFS_EXT2_MAGIC;
-    root.flags = FS_DIRECTORY;
-    root.open_flags = 0;
-    root.create_time = root.access_time = root.modified_time = 0;
-    root.offset = 0;
-    root.nlink = 2;
-    root.refcount = 0;
-
-    root.read = nullptr;
-    root.write = nullptr;
-    root.open = nullptr;
-    root.close = nullptr;
-    root.readdir = nullptr;
-    root.finddir = nullptr;
-    root.create = nullptr;
-    root.unlink = nullptr;
-    root.mkdir = nullptr;
-    root.ioctl = nullptr;
-    root.get_size = nullptr;
-    root.chmod = nullptr;
-    root.get_file_size = nullptr;
-    root.listdir = nullptr;
-    
-    log->ok("Ext2 FileSystem is initialized successfully.");
-}
-
 extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
     KAtaInfo kataInfo = InitializeKAta(bootInfo);
 
@@ -82,7 +39,7 @@ extern "C" void _init_kata_main_process(BootInfo* bootInfo) {
         while (true);
     } */
 
-    //init_ata_shell();
+    init_ata_shell();
 
     // avoid computer to stop
     while (true)

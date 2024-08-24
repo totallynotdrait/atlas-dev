@@ -23,3 +23,8 @@ char* strcpy(char* dst, const char* src)
 {
     return __strcpy(dst, src);
 }
+
+int strncmp(char* s1, char* s2, int bytes)
+{
+    return (__strncmp(s1, s2, bytes) == 0);
+}

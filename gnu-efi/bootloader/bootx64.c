@@ -4,6 +4,19 @@
 #include <efilib.h>
 #include <elf.h>
 
+
+__attribute__((section(".multiboot_header")))
+static const struct multiboot_header {
+    uint32_t magic;
+    uint32_t architecture;
+    uint32_t header_length;
+    uint32_t checksum;
+} multiboot_header = {
+    .magic = 0xe85250d6, // Multiboot2 magic number
+    .architecture = 0,   // i386 architecture
+    .header_length = (uint32_t)sizeof(struct multiboot_header),
+    .checksum = -(0xe85250d6 + 0 + (uint32_t)sizeof(struct multiboot_header))
+};
 typedef unsigned long long size_t;
 
 typedef struct {
@@ -56,20 +69,27 @@ FrameBuffer* InitializeGOP() {
 }
 
 EFI_FILE* LoadFile(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
+	Print(L"[LOAD_FILE] Making pointer\r\n");
 	EFI_FILE* LoadedFile;
 
+	Print(L"[LOAD_FILE] Loaded Image\r\n");
 	EFI_LOADED_IMAGE_PROTOCOL* LoadedImage;
 	SystemTable->BootServices->HandleProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, (void**)&LoadedImage);
 
+	Print(L"[LOAD_FILE] Loaded FileSystem\r\n");
 	EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* FileSystem;
 	SystemTable->BootServices->HandleProtocol(LoadedImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void**)&FileSystem);
 
+
 	if (Directory == NULL) {
+		Print(L"[LOAD_FILE] Directory is null\r\n");
 		FileSystem->OpenVolume(FileSystem, &Directory);
 	}
 
+	Print(L"[LOAD_FILE] Opening file\r\n");
 	EFI_STATUS s = Directory->Open(Directory, &LoadedFile, Path, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
 	if (s != EFI_SUCCESS) {
+		Print(L"[LOAD_FILE] Failed to load file\r\n");
 		return NULL;
 	}
 	return LoadedFile;
@@ -136,6 +156,8 @@ typedef struct {
 	void* rsdp;
 } BootInfo;
 
+
+
 UINTN strcmp(CHAR8* a, CHAR8* b, UINTN length) {
 	for (UINTN i = 0; i < length; i++) {
 		if (*a != *b) return 0;
@@ -143,17 +165,24 @@ UINTN strcmp(CHAR8* a, CHAR8* b, UINTN length) {
 	return 1;
 }
 
+// myes
+void reference_multiboot_header() {
+    (void)multiboot_header;
+}
+
 EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	InitializeLib(ImageHandle, SystemTable);
 	Print(L"\n\r[Atlas UEFI Bootloader (kata_bootloader-x86_64)]\n\r");
-	Print(L"Loading KAta-x86_64...");
+	Print(L"Loading KAta-x86_64 ...\n\r");
+	reference_multiboot_header();
 	EFI_FILE* KAta = LoadFile(NULL, L"kata.elf", ImageHandle, SystemTable);
 	if (KAta == NULL) {
 		Print(L"\n\rCould not load KAta, i guess we're just here alone, you and me >:3\n\r");
 	} else {
 		// Print(L"\n\rLoaded KAta\n\r");
 	}
-
+	
+	Print(L"Preaparing ELF header ...\n\r");
 	Elf64_Ehdr header;
 	{
 		UINTN FileInfoSize;
@@ -166,6 +195,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		KAta->Read(KAta, &size, &header);
 
 	}
+	Print(L"Checking if header is valid ...\n\r");
 
 	if (
 		memcmp(&header.e_ident[EI_MAG0], ELFMAG, SELFMAG) != 0 ||
@@ -178,9 +208,10 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		Print(L"Kernel format is incompatible, kernel needs to be recompiled\r\n");
 	}
 	else {
-		//Print(L"Kernel format is ok\r\n");
+		Print(L"Header is ok\r\n");
 	}
 
+	Print(L"Setting up ...\r\n");
 	Elf64_Phdr* phdrs;
 	{
 		KAta->SetPosition(KAta, header.e_phoff);
@@ -209,19 +240,19 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		}
 	}
 
-	//Print(L"KAta Loaded\n\r");
+	Print(L"KAta Loaded\n\r");
 
 	PSF1_FONT* newFont = LoadPSF1Font(NULL, L"zap-vga.psf", ImageHandle, SystemTable);
 	if (newFont == NULL) {
 		Print(L"Invalid font or binary not found\n");
 	} else {
-		//Print(L"Font found. char size = %d\n\r", newFont->psf1_Header->charsize);
+		Print(L"Font found. char size = %d\n\r", newFont->psf1_Header->charsize);
 	}
 
 	
 	FrameBuffer* newBuffer = InitializeGOP();
 
-	//Print(L"Base: 0x%x\n\rSize: 0x%\n\rWidth: %d\n\rHeight: %d\n\rPixelsPerScanline: %d\n\r\n\r",newBuffer->BaseAddress,newBuffer->BufferSize,newBuffer->Width,newBuffer->Height,newBuffer->PixelsPerScanline);
+	Print(L"Base: 0x%x\n\rSize: 0x%\n\rWidth: %d\n\rHeight: %d\n\rPixelsPerScanline: %d\n\r\n\r",newBuffer->BaseAddress,newBuffer->BufferSize,newBuffer->Width,newBuffer->Height,newBuffer->PixelsPerScanline);
 
 	EFI_MEMORY_DESCRIPTOR* Map = NULL;
 	UINTN MapSize, MapKey;
@@ -235,6 +266,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
 	}
 
+	Print(L"Configuring EFI_TABLE ...\r\n");
 	EFI_CONFIGURATION_TABLE* configTable = SystemTable->ConfigurationTable;
 	void* rsdp= NULL;
 	EFI_GUID Acpi2TableGuid = ACPI_20_TABLE_GUID;
@@ -250,6 +282,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	}
 
 	/*KATA MAIN ARGUMENT START FUNCTIONS*/
+	Print(L"Calling kernel ...\r\n");
 	void (*KAtaStart)(BootInfo*) = ((__attribute((sysv_abi)) void (*)(BootInfo*) )header.e_entry);
 
 	BootInfo bootInfo;

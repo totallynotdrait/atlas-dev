@@ -1,6 +1,7 @@
 #include "PIT.h"
 #include <IO/IO.h>
 #include <kata_renderer/kata_renderer.h>
+#include <scheduling/RTC/RTC.h>
 
 namespace PIT {
     double TimeSinceBoot = 0;

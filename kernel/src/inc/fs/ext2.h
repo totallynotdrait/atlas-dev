@@ -1,4 +1,6 @@
-#pragma once
+// temporary comemnt it out
+
+/* #pragma once
 
 #include <stdint.h>
 #include <drivers/device/device.h>
@@ -51,6 +53,18 @@
 #define RO_FEAT_SPARSE 0x0001
 #define RO_FEAT_FS_LONG_FILE_SIZE 0x0002
 #define RO_FEAT_DIR_STORED_BINARY_TREE 0x0004
+
+// THINGS HEAYEEAYEYeyeaayeaa                           WHAT'S GOING ON??!!?!?!??!
+#define SUPERBLOCK_SIZE 1024
+#define ROOT_INODE_NUMBER 2
+
+#define EXT2_S_IFSOCK   0xC000
+#define EXT2_S_IFLNK    0xA000
+#define EXT2_S_IFREG    0x8000
+#define EXT2_S_IFBLK    0x6000
+#define EXT2_S_IFDIR    0x4000
+#define EXT2_S_IFCHR    0x2000
+#define EXT2_S_IFIFO    0x1000
 
 struct fs_base_superblock {
     uint8_t inodes;
@@ -160,22 +174,4 @@ struct ext2_fs_t {
     uint32_t bgd_blocks;
 };
 
-class Ext2 {
-public:
-    Ext2(Device* device);
-    void Init();
-    void ReadBlock(uint64_t blockNum, void* buffer);
-    void WriteBlock(uint64_t blockNum, void* buffer);
-    void read_superblock();
-    void read_block_group_descriptors();
-    uint32_t get_block_from_offset(struct inode_t *inode, uint32_t offset);
-    struct inode_t *get_inode(uint32_t inode_num);
-    uint32_t find_free_inode();
-    uint32_t find_free_block();
-    void make_dir(struct vfs_node_t *parent_node, const char *name, uint16_t permission);
-    uint32_t read(vfs_node_t *node, uint32_t offset, uint32_t size, char *buffer);
-
-private:
-    Device* device;
-    ext2_fs_t fs;
-};
+ */
